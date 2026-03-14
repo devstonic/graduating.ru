@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎓 Квест выпускника: Большая жизнь</title>
+    <title>🎓 Квест выпускника: 8 путей</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         .music-btn { 
@@ -97,7 +97,7 @@
     <div class="wrapper">
         <div class="card" id="app">
             <div class="greeting">🎓 Выпускной</div>
-            <div class="holiday-name">КВЕСТ: БОЛЬШАЯ ЖИЗНЬ</div>
+            <div class="holiday-name">8 ПУТЕЙ</div>
             <div class="divider"></div>
             <div class="progress">
                 <div class="progress-bar" id="progressBar" style="width: 0%"></div>
@@ -119,475 +119,634 @@
             const gameArea = document.getElementById('gameArea');
             const progressBar = document.getElementById('progressBar');
             
-            // ==================== РАСШИРЕННОЕ ДЕРЕВО КВЕСТА ====================
+            // ==================== СИСТЕМА ХАРАКТЕРИСТИК ====================
+            const stats = {
+                ум: { name: '🧠 Ум', emoji: '🧠' },
+                знания: { name: '📚 Знания', emoji: '📚' },
+                деньги: { name: '💰 Деньги', emoji: '💰' },
+                успех: { name: '🏆 Успех', emoji: '🏆' },
+                путешествия: { name: '✈️ Путешествия', emoji: '✈️' },
+                приключения: { name: '🎢 Приключения', emoji: '🎢' },
+                творчество: { name: '🎨 Творчество', emoji: '🎨' },
+                искусство: { name: '🎭 Искусство', emoji: '🎭' },
+                забота: { name: '❤️ Забота', emoji: '❤️' },
+                помощь: { name: '🤝 Помощь', emoji: '🤝' },
+                веселье: { name: '🎉 Веселье', emoji: '🎉' },
+                радость: { name: '😊 Радость', emoji: '😊' },
+                спокойствие: { name: '🧘 Спокойствие', emoji: '🧘' },
+                гармония: { name: '☯️ Гармония', emoji: '☯️' },
+                общение: { name: '👥 Общение', emoji: '👥' },
+                дружба: { name: '🤗 Дружба', emoji: '🤗' },
+                любовь: { name: '💑 Любовь', emoji: '💑' },
+                романтика: { name: '💕 Романтика', emoji: '💕' },
+                энергия: { name: '⚡ Энергия', emoji: '⚡' },
+                сила: { name: '💪 Сила', emoji: '💪' },
+                лидерство: { name: '👑 Лидерство', emoji: '👑' },
+                амбиции: { name: '🚀 Амбиции', emoji: '🚀' }
+            };
+
+            // ==================== 8+ СЮЖЕТНЫХ ВЕТОК ====================
             const questTree = {
-                // Уровень 1: Начало
+                // ===== УРОВЕНЬ 1: НАЧАЛО =====
                 start: {
                     id: 'start',
-                    text: "🎓 Школа позади. Какое у тебя настроение?",
+                    text: "🎓 Школа позади. Какую дорогу выберешь?",
                     paths: [
                         { 
-                            title: "🌟 Воодушевлённое", 
-                            desc: "Весь мир открыт!",
-                            next: "excited",
-                            item: "✨ Энтузиазм",
-                            points: { fun: 3, energy: 2 }
+                            title: "🏛️ Университет", 
+                            desc: "Пойти учиться дальше",
+                            next: "university_main",
+                            item: "🎓 Аттестат",
+                            stats: { знания: 2, ум: 1 }
                         },
                         { 
-                            title: "😨 Немного страшно", 
-                            desc: "Всё так неизвестно",
-                            next: "scared",
-                            item: "😰 Смелость",
-                            points: { mind: 2, calm: 2 }
+                            title: "💼 Работа", 
+                            desc: "Начать карьеру",
+                            next: "work_main",
+                            item: "💪 Трудолюбие",
+                            stats: { деньги: 2, успех: 1 }
                         },
                         { 
-                            title: "🤔 Задумчивое", 
-                            desc: "Надо всё обдумать",
-                            next: "thoughtful",
-                            item: "📝 План",
-                            points: { mind: 3, calm: 1 }
+                            title: "✈️ Путешествия", 
+                            desc: "Посмотреть мир",
+                            next: "travel_main",
+                            item: "🌍 Рюкзак",
+                            stats: { путешествия: 3, приключения: 2 }
                         },
                         { 
-                            title: "🎉 Хочется праздника", 
-                            desc: "Отдохнуть перед будущим",
-                            next: "party",
-                            item: "🥂 Веселье",
-                            points: { fun: 3, social: 2 }
+                            title: "🎨 Творчество", 
+                            desc: "Развивать таланты",
+                            next: "art_main",
+                            item: "🎨 Вдохновение",
+                            stats: { творчество: 3, искусство: 1 }
+                        },
+                        { 
+                            title: "❤️ Любовь", 
+                            desc: "Искать вторую половинку",
+                            next: "love_main",
+                            item: "💕 Романтика",
+                            stats: { любовь: 3, романтика: 2 }
+                        },
+                        { 
+                            title: "👨‍👩‍👧 Семья", 
+                            desc: "Быть рядом с родными",
+                            next: "family_main",
+                            item: "🏡 Дом",
+                            stats: { забота: 3, спокойствие: 1 }
+                        },
+                        { 
+                            title: "🤝 Друзья", 
+                            desc: "Остаться с друзьями",
+                            next: "friends_main",
+                            item: "👥 Команда",
+                            stats: { дружба: 3, общение: 2 }
+                        },
+                        { 
+                            title: "🏆 Спорт", 
+                            desc: "Стать чемпионом",
+                            next: "sport_main",
+                            item: "💪 Сила",
+                            stats: { сила: 3, энергия: 2 }
                         }
                     ]
                 },
                 
-                // Уровень 2: Ветка "Воодушевлённое"
-                excited: {
-                    id: 'excited',
-                    text: "🔥 Ты полон энергии! Куда направишь её?",
+                // ===== ВЕТКА 1: УНИВЕРСИТЕТ =====
+                university_main: {
+                    text: "🏛️ Ты поступил в университет. Какой факультет?",
                     paths: [
-                        { title: "🏛️ Университет", desc: "Покорять науку", next: "university1", item: "🎓 Абитуриент", points: { mind: 2 } },
-                        { title: "💼 Работа", desc: "Зарабатывать", next: "work1", item: "💪 Трудолюбие", points: { money: 2 } },
-                        { title: "✈️ Путешествия", desc: "Искать приключения", next: "travel1", item: "🌍 Билет", points: { travel: 3 } },
-                        { title: "🎨 Творчество", desc: "Создавать", next: "art1", item: "🎨 Вдохновение", points: { art: 3 } }
+                        { title: "💻 IT-технологии", desc: "Программирование, нейросети", next: "uni_it", item: "⌨️ Клавиатура", stats: { ум: 3 } },
+                        { title: "⚖️ Юридический", desc: "Право, суды, законы", next: "uni_law", item: "⚖️ Фемида", stats: { знания: 3 } },
+                        { title: "🏥 Медицина", desc: "Лечить людей", next: "uni_med", item: "🩺 Стетоскоп", stats: { забота: 3 } },
+                        { title: "🎭 Искусств", desc: "Театр, кино, музыка", next: "uni_art", item: "🎭 Маска", stats: { искусство: 3 } },
+                        { title: "📊 Экономика", desc: "Бизнес, финансы", next: "uni_econ", item: "📈 График", stats: { деньги: 3 } },
+                        { title: "🔬 Научный", desc: "Исследования, открытия", next: "uni_science", item: "🔬 Лаборатория", stats: { знания: 3, ум: 2 } }
                     ]
                 },
                 
-                // Уровень 2: Ветка "Страшно"
-                scared: {
-                    id: 'scared',
-                    text: "😰 Страх - это нормально. Что поможет?",
+                uni_it: {
+                    text: "💻 Ты выбрал IT. Какая сфера интереснее?",
                     paths: [
-                        { title: "👨‍👩‍👧 Семья", desc: "Поддержка родных", next: "family1", item: "💝 Любовь", points: { care: 3 } },
-                        { title: "🤝 Друзья", desc: "Вместе веселее", next: "friends1", item: "👥 Дружба", points: { social: 3 } },
-                        { title: "📚 Книги", desc: "Набраться знаний", next: "books1", item: "📖 Мудрость", points: { mind: 3 } },
-                        { title: "🧘 Самоанализ", desc: "Понять себя", next: "self1", item: "🧠 Осознанность", points: { calm: 3 } }
+                        { title: "🤖 Искусственный интеллект", desc: "Нейросети, будущее", next: "uni_ai", item: "🧠 ИИ", stats: { ум: 4 } },
+                        { title: "📱 Мобильная разработка", desc: "Приложения для всех", next: "uni_mobile", item: "📱 Приложение", stats: { деньги: 3, ум: 2 } },
+                        { title: "🎮 Геймдев", desc: "Создавать игры", next: "uni_games", item: "🎮 Игра", stats: { веселье: 3, творчество: 2 } },
+                        { title: "🌐 Веб-разработка", desc: "Сайты, сервисы", next: "uni_web", item: "🌐 Сайт", stats: { ум: 2, деньги: 2 } }
                     ]
                 },
                 
-                // Уровень 2: Ветка "Задумчивое"
-                thoughtful: {
-                    id: 'thoughtful',
-                    text: "🤔 Ты любишь планировать. Что в приоритете?",
+                uni_ai: {
+                    text: "🤖 Ты создаёшь нейросети. Куда применить?",
                     paths: [
-                        { title: "💰 Карьера", desc: "Достичь высот", next: "career1", item: "📈 Амбиции", points: { money: 3 } },
-                        { title: "❤️ Отношения", desc: "Найти любовь", next: "love1", item: "💕 Романтика", points: { love: 3 } },
-                        { title: "🌍 Мир", desc: "Понять устройство", next: "world1", item: "🌐 Кругозор", points: { mind: 3 } },
-                        { title: "🏠 Дом", desc: "Создать уют", next: "home1", item: "🏡 Уют", points: { calm: 3 } }
+                        { title: "🚀 Свой стартап", desc: "Создать компанию", next: "final_ai_startup", item: "💡 Идея", stats: { амбиции: 5, деньги: 3 } },
+                        { title: "🏢 Google/Microsoft", desc: "Работа в корпорации", next: "final_ai_corp", item: "💼 Офис", stats: { деньги: 4, успех: 3 } },
+                        { title: "🔬 Научный институт", desc: "Исследования", next: "final_ai_science", item: "📚 Наука", stats: { знания: 5, ум: 4 } },
+                        { title: "🌍 Свободный художник", desc: "Фриланс по миру", next: "final_ai_freelance", item: "🏝️ Ноутбук", stats: { путешествия: 4, деньги: 2 } }
                     ]
                 },
                 
-                // Уровень 2: Ветка "Хочется праздника"
-                party: {
-                    id: 'party',
-                    text: "🎉 Вечеринка удалась! Что дальше?",
+                uni_law: {
+                    text: "⚖️ Юриспруденция. Кем станешь?",
                     paths: [
-                        { title: "🎪 Фестиваль", desc: "Ещё веселья", next: "festival1", item: "🎭 Маска", points: { fun: 3 } },
-                        { title: "🏖️ Отпуск", desc: "Расслабиться", next: "vacation1", item: "🍹 Коктейль", points: { fun: 2, calm: 2 } },
-                        { title: "💃 Танцы", desc: "Развивать талант", next: "dance1", item: "💃 Грация", points: { art: 3 } },
-                        { title: "🥁 Музыка", desc: "Играть в группе", next: "band1", item: "🎸 Гитара", points: { art: 3, fun: 2 } }
+                        { title: "👨‍⚖️ Судья", desc: "Вершить правосудие", next: "final_judge", item: "🔨 Молоток", stats: { спокойствие: 4, знания: 3 } },
+                        { title: "👔 Адвокат", desc: "Защищать людей", next: "final_lawyer", item: "⚖️ Право", stats: { забота: 4, ум: 3 } },
+                        { title: "🏢 Корпоративный юрист", desc: "Работа с бизнесом", next: "final_corp_law", item: "📑 Контракт", stats: { деньги: 4, успех: 3 } },
+                        { title: "🔍 Следователь", desc: "Расследовать преступления", next: "final_investigator", item: "🔎 Лупа", stats: { ум: 4, приключения: 2 } }
                     ]
                 },
                 
-                // ===== УНИВЕРСИТЕТСКАЯ ВЕТКА (глубокая) =====
-                university1: {
-                    id: 'university1',
-                    text: "🏛️ Какой факультет привлекает?",
-                    paths: [
-                        { title: "💻 IT", desc: "Программирование", next: "it1", item: "⌨️ Клавиатура", points: { mind: 3 } },
-                        { title: "⚖️ Юридический", desc: "Защита прав", next: "law1", item: "⚖️ Фемида", points: { mind: 2, money: 2 } },
-                        { title: "🎨 Искусств", desc: "Творчество", next: "artUni", item: "🎨 Палитра", points: { art: 3 } },
-                        { title: "🏥 Медицина", desc: "Помощь людям", next: "med1", item: "🩺 Стетоскоп", points: { care: 3 } }
-                    ]
-                },
-                
-                it1: {
-                    text: "💻 Программирование. Какой язык выберешь?",
-                    paths: [
-                        { title: "🐍 Python", desc: "Анализ данных", next: "python", item: "📊 Данные", points: { mind: 4 } },
-                        { title: "☕ Java", desc: "Корпоративная разработка", next: "java", item: "🏢 Энтерпрайз", points: { money: 4 } },
-                        { title: "🌐 JavaScript", desc: "Веб-сайты", next: "js", item: "🌍 Сайты", points: { fun: 3, mind: 2 } },
-                        { title: "📱 Mobile", desc: "Приложения", next: "mobile", item: "📱 Приложение", points: { money: 3, mind: 3 } }
-                    ]
-                },
-                
-                python: {
-                    text: "🐍 Python. Куда пойти работать?",
-                    paths: [
-                        { title: "🤖 AI", desc: "Нейросети", next: "ai", item: "🧠 ИИ", points: { mind: 5, money: 3 } },
-                        { title: "📈 Data Science", desc: "Аналитика", next: "datascience", item: "📊 Анализ", points: { mind: 5, money: 4 } },
-                        { title: "🕸️ Web", desc: "Сайты на Django", next: "django", item: "🌐 Сайт", points: { mind: 3, money: 3 } },
-                        { title: "🎮 Игры", desc: "Геймдев", next: "gamedev", item: "🎮 Игра", points: { fun: 4, mind: 3 } }
-                    ]
-                },
-                
-                ai: {
-                    text: "🤖 Ты создаёшь ИИ будущего!",
-                    paths: [
-                        { title: "🚀 Стартап", desc: "Своя компания", next: "aiStartup", item: "💡 Идея", points: { money: 5, mind: 5 } },
-                        { title: "🏢 Корпорация", desc: "Работа в Google", next: "aiCorp", item: "💼 Офис", points: { money: 5, calm: 3 } },
-                        { title: "📚 Наука", desc: "Исследования", next: "aiScience", item: "🔬 Лаборатория", points: { mind: 5, calm: 4 } },
-                        { title: "🌍 Свобода", desc: "Фриланс", next: "aiFree", item: "🏝️ Ноутбук", points: { travel: 4, money: 3 } }
-                    ]
-                },
-                
-                law1: {
-                    text: "⚖️ Юриспруденция. Какая сфера?",
-                    paths: [
-                        { title: "🏢 Корпоративное право", desc: "Бизнес", next: "corpLaw", item: "📑 Контракт", points: { money: 4 } },
-                        { title: "👤 Адвокат", desc: "Защита людей", next: "advocate", item: "⚖️ Право", points: { care: 4 } },
-                        { title: "🔍 Следователь", desc: "Расследования", next: "investigator", item: "🔎 Лупа", points: { mind: 4 } },
-                        { title: "🏛️ Судья", desc: "Правосудие", next: "judge", item: "🔨 Молоток", points: { mind: 4, calm: 3 } }
-                    ]
-                },
-                
-                med1: {
+                uni_med: {
                     text: "🏥 Медицина. Какая специализация?",
                     paths: [
-                        { title: "💉 Хирург", desc: "Спасать жизни", next: "surgeon", item: "🔪 Скальпель", points: { care: 5, mind: 4 } },
-                        { title: "🧠 Психиатр", desc: "Лечить душу", next: "psych", item: "🧠 Мозг", points: { mind: 4, care: 4 } },
-                        { title: "👶 Педиатр", desc: "Лечить детей", next: "pediatric", item: "🍼 Дети", points: { care: 5, fun: 3 } },
-                        { title: "🚑 Скорая", desc: "На передовой", next: "ambulance", item: "🚑 Фельдшер", points: { care: 4, energy: 4 } }
+                        { title: "💉 Хирург", desc: "Спасать жизни", next: "final_surgeon", item: "🔪 Скальпель", stats: { забота: 5, ум: 4 } },
+                        { title: "👶 Педиатр", desc: "Лечить детей", next: "final_pediatr", item: "🍼 Дети", stats: { забота: 5, радость: 3 } },
+                        { title: "🧠 Психиатр", desc: "Лечить душу", next: "final_psych", item: "🧠 Мозг", stats: { знания: 4, забота: 4 } },
+                        { title: "🚑 Скорая помощь", desc: "На передовой", next: "final_ambulance", item: "🚑 Фельдшер", stats: { помощь: 4, энергия: 4 } },
+                        { title: "🔬 Учёный-медик", desc: "Искать лекарства", next: "final_med_science", item: "🔬 Исследование", stats: { знания: 5, ум: 4 } }
                     ]
                 },
                 
-                // ===== РАБОЧАЯ ВЕТКА =====
-                work1: {
-                    text: "💼 Работа. В какой сфере?",
+                // ===== ВЕТКА 2: РАБОТА =====
+                work_main: {
+                    text: "💼 Ты идёшь работать. Куда устроишься?",
                     paths: [
-                        { title: "👔 Офис", desc: "Бизнес-центр", next: "office1", item: "👔 Галстук", points: { money: 3 } },
-                        { title: "🚀 Стартап", desc: "Своё дело", next: "startup1", item: "🚀 Идея", points: { money: 2, fun: 2 } },
-                        { title: "👨‍🏫 Образование", desc: "Учить детей", next: "teacher1", item: "📚 Учебник", points: { care: 3 } },
-                        { title: "👨‍🔧 Производство", desc: "Реальный сектор", next: "factory1", item: "🔧 Инструмент", points: { skill: 3 } }
+                        { title: "🏢 Офис", desc: "Бизнес-центр, карьера", next: "work_office", item: "👔 Галстук", stats: { деньги: 3 } },
+                        { title: "🚀 Стартап", desc: "Своё дело", next: "work_startup", item: "🚀 Идея", stats: { амбиции: 3, веселье: 2 } },
+                        { title: "👨‍🏫 Учитель", desc: "Работа в школе", next: "work_teacher", item: "📚 Учебник", stats: { забота: 3, знания: 2 } },
+                        { title: "👨‍🔧 Рабочий", desc: "Завод, стройка", next: "work_factory", item: "🔧 Инструмент", stats: { сила: 3, деньги: 2 } },
+                        { title: "💇‍♀️ Сфера услуг", desc: "Красота, здоровье", next: "work_service", item: "💅 Услуги", stats: { общение: 3, деньги: 2 } }
                     ]
                 },
                 
-                office1: {
+                work_office: {
                     text: "👔 Офис. Кем устроишься?",
                     paths: [
-                        { title: "📊 Менеджер", desc: "Управление", next: "manager", item: "📋 План", points: { money: 3 } },
-                        { title: "💰 Финансист", desc: "Деньги", next: "financier", item: "💰 Деньги", points: { money: 4, mind: 2 } },
-                        { title: "📈 Маркетолог", desc: "Реклама", next: "marketer", item: "📱 Реклама", points: { fun: 3, money: 3 } },
-                        { title: "🤝 HR", desc: "Поиск людей", next: "hr", item: "👥 Команда", points: { social: 3, care: 2 } }
+                        { title: "📊 Менеджер", desc: "Управлять командой", next: "final_manager", item: "📋 План", stats: { лидерство: 3, деньги: 2 } },
+                        { title: "💰 Финансист", desc: "Работа с деньгами", next: "final_financier", item: "💰 Деньги", stats: { деньги: 4, ум: 3 } },
+                        { title: "📈 Маркетолог", desc: "Реклама, продвижение", next: "final_marketer", item: "📱 Реклама", stats: { творчество: 3, деньги: 3 } },
+                        { title: "🤝 HR-менеджер", desc: "Искать сотрудников", next: "final_hr", item: "👥 Команда", stats: { общение: 4, забота: 2 } }
                     ]
                 },
                 
-                startup1: {
+                work_startup: {
                     text: "🚀 Стартап. Какая идея?",
                     paths: [
-                        { title: "📱 Приложение", desc: "Мобильный сервис", next: "appStartup", item: "📱 Апп", points: { mind: 3, money: 3 } },
-                        { title: "🌱 Экология", desc: "Зелёные технологии", next: "ecoStartup", item: "🌍 Планета", points: { care: 4, mind: 2 } },
-                        { title: "🍔 Доставка", desc: "Еда", next: "foodStartup", item: "🍔 Бургер", points: { money: 3, fun: 2 } },
-                        { title: "🎓 Образование", desc: "Онлайн-курсы", next: "eduStartup", item: "🎓 Курс", points: { mind: 3, care: 3 } }
+                        { title: "📱 Мобильное приложение", desc: "Для миллионов людей", next: "final_app_startup", item: "📱 Апп", stats: { ум: 3, деньги: 3 } },
+                        { title: "🌱 Экологический проект", desc: "Спасать планету", next: "final_eco_startup", item: "🌍 Планета", stats: { забота: 4, ум: 2 } },
+                        { title: "🍔 Доставка еды", desc: "Кормить людей", next: "final_food_startup", item: "🍔 Бургер", stats: { деньги: 3, веселье: 2 } },
+                        { title: "🎓 Образовательный проект", desc: "Учить людей", next: "final_edu_startup", item: "🎓 Курс", stats: { знания: 3, забота: 3 } }
                     ]
                 },
                 
-                // ===== ПУТЕШЕСТВИЯ =====
-                travel1: {
-                    text: "🌍 Путешествия. Куда сначала?",
+                // ===== ВЕТКА 3: ПУТЕШЕСТВИЯ =====
+                travel_main: {
+                    text: "🌍 Путешествия. Куда поедешь сначала?",
                     paths: [
-                        { title: "🏔️ Горы", desc: "Альпинизм", next: "mountains1", item: "⛰️ Ледоруб", points: { travel: 3, energy: 2 } },
-                        { title: "🏖️ Море", desc: "Пляжный отдых", next: "sea1", item: "🏄 Серф", points: { fun: 3, calm: 2 } },
-                        { title: "🏙️ Мегаполисы", desc: "Нью-Йорк, Токио", next: "city1", item: "🗽 Статуя", points: { travel: 3, money: 1 } },
-                        { title: "🌄 Природа", desc: "Леса, озёра", next: "nature1", item: "🏕️ Палатка", points: { calm: 3, travel: 2 } }
+                        { title: "🏔️ Горы", desc: "Альпинизм, треккинг", next: "travel_mountains", item: "⛰️ Ледоруб", stats: { приключения: 3, энергия: 2 } },
+                        { title: "🏖️ Море", desc: "Пляжи, океан", next: "travel_sea", item: "🏄 Доска", stats: { радость: 3, спокойствие: 2 } },
+                        { title: "🏙️ Мегаполисы", desc: "Нью-Йорк, Токио", next: "travel_cities", item: "🗽 Статуя", stats: { путешествия: 3, деньги: 1 } },
+                        { title: "🌄 Природа", desc: "Леса, озёра", next: "travel_nature", item: "🏕️ Палатка", stats: { гармония: 3, спокойствие: 2 } },
+                        { title: "🏜️ Экзотика", desc: "Пустыни, джунгли", next: "travel_exotic", item: "🐪 Верблюд", stats: { приключения: 4, путешествия: 2 } }
                     ]
                 },
                 
-                mountains1: {
-                    text: "🏔️ Ты в горах. Что чувствуешь?",
+                travel_mountains: {
+                    text: "🏔️ Ты в горах. Что будешь делать?",
                     paths: [
-                        { title: "🥇 Покорить вершину", desc: "Эверест ждёт", next: "everest", item: "🚩 Флаг", points: { energy: 4, travel: 3 } },
-                        { title: "📸 Фотографировать", desc: "Красота вокруг", next: "photoTravel", item: "📷 Фото", points: { art: 3, calm: 3 } },
-                        { title: "🧘 Медитировать", desc: "Тишина", next: "meditate", item: "🧘 Покой", points: { calm: 4, mind: 2 } },
-                        { title: "🏕️ Жить в лагере", desc: "Палатки, костёр", next: "camp", item: "🔥 Костёр", points: { fun: 3, social: 2 } }
+                        { title: "🥇 Покорить Эверест", desc: "Главная вершина", next: "final_everest", item: "🚩 Флаг", stats: { сила: 5, приключения: 4 } },
+                        { title: "📸 Стать фотографом", desc: "Снимать красоту", next: "final_mountain_photo", item: "📷 Фото", stats: { творчество: 4, путешествия: 3 } },
+                        { title: "🧘 Жить в горах", desc: "Отшельничество", next: "final_mountain_monk", item: "🧘 Покой", stats: { спокойствие: 5, гармония: 4 } },
+                        { title: "🏕️ Водить туристов", desc: "Стать гидом", next: "final_mountain_guide", item: "🗺️ Карта", stats: { общение: 3, путешествия: 3 } }
                     ]
                 },
                 
-                // ===== ТВОРЧЕСТВО =====
-                art1: {
+                travel_sea: {
+                    text: "🏖️ Ты у моря. Чем займёшься?",
+                    paths: [
+                        { title: "🏄 Стать серфером", desc: "Покорять волны", next: "final_surfer", item: "🏄 Доска", stats: { веселье: 4, энергия: 3 } },
+                        { title: "🚤 Открыть бизнес", desc: "Кафе, отель", next: "final_beach_biz", item: "🍹 Коктейль", stats: { деньги: 4, успех: 3 } },
+                        { title: "🐠 Изучать море", desc: "Биолог, дайвер", next: "final_marine", item: "🐠 Рыбка", stats: { знания: 4, приключения: 3 } },
+                        { title: "🧘 Жить у моря", desc: "Медитации, йога", next: "final_beach_life", item: "🌅 Закат", stats: { гармония: 4, спокойствие: 3 } }
+                    ]
+                },
+                
+                // ===== ВЕТКА 4: ТВОРЧЕСТВО =====
+                art_main: {
                     text: "🎨 Творчество. Что выберешь?",
                     paths: [
-                        { title: "🎸 Музыка", desc: "Играть и петь", next: "music1", item: "🎸 Гитара", points: { art: 3 } },
-                        { title: "🎬 Кино", desc: "Снимать фильмы", next: "cinema1", item: "🎥 Камера", points: { art: 3, fun: 2 } },
-                        { title: "✍️ Писательство", desc: "Сочинять", next: "write1", item: "✍️ Перо", points: { mind: 3, art: 2 } },
-                        { title: "🎨 Рисование", desc: "Картины", next: "paint1", item: "🎨 Кисть", points: { art: 3, calm: 2 } }
+                        { title: "🎸 Музыка", desc: "Петь, играть", next: "art_music", item: "🎸 Гитара", stats: { искусство: 3 } },
+                        { title: "🎬 Кино", desc: "Снимать фильмы", next: "art_cinema", item: "🎥 Камера", stats: { творчество: 3, веселье: 2 } },
+                        { title: "✍️ Писательство", desc: "Сочинять книги", next: "art_write", item: "✍️ Перо", stats: { ум: 3, творчество: 2 } },
+                        { title: "🎨 Живопись", desc: "Рисовать картины", next: "art_paint", item: "🎨 Кисть", stats: { искусство: 3, спокойствие: 2 } },
+                        { title: "💃 Танцы", desc: "Движение, балет", next: "art_dance", item: "💃 Туфли", stats: { энергия: 3, творчество: 2 } }
                     ]
                 },
                 
-                music1: {
-                    text: "🎸 Ты хочешь заниматься музыкой. Как?",
+                art_music: {
+                    text: "🎸 Музыка. Какой путь?",
                     paths: [
-                        { title: "🎤 Солист", desc: "Сцена и слава", next: "singer", item: "🎤 Микрофон", points: { art: 4, fun: 3 } },
-                        { title: "🎸 Гитарист в группе", desc: "Рок-звезда", next: "bandMember", item: "🎸 Электруха", points: { fun: 4, art: 3 } },
-                        { title: "🎼 Композитор", desc: "Писать музыку", next: "composer", item: "🎹 Синтезатор", points: { mind: 3, art: 4 } },
-                        { title: "🏫 Учитель музыки", desc: "Учить детей", next: "musicTeacher", item: "📚 Ноты", points: { care: 4, art: 2 } }
+                        { title: "🎤 Стать звездой", desc: "Сцена, слава", next: "final_singer", item: "🎤 Микрофон", stats: { успех: 4, искусство: 4 } },
+                        { title: "🎸 Играть в группе", desc: "Рок-н-ролл", next: "final_band", item: "🎸 Электруха", stats: { веселье: 4, дружба: 3 } },
+                        { title: "🎼 Писать музыку", desc: "Композитор", next: "final_composer", item: "🎹 Синтезатор", stats: { творчество: 4, ум: 3 } },
+                        { title: "🏫 Учить музыке", desc: "Педагог", next: "final_music_teacher", item: "📚 Ноты", stats: { забота: 4, искусство: 3 } },
+                        { title: "🎻 Играть в оркестре", desc: "Классика", next: "final_orchestra", item: "🎻 Скрипка", stats: { спокойствие: 3, искусство: 4 } }
                     ]
                 },
                 
-                cinema1: {
-                    text: "🎬 Кино. Какая роль?",
+                art_cinema: {
+                    text: "🎬 Кино. Кем хочешь стать?",
                     paths: [
-                        { title: "🎭 Актёр", desc: "Играть роли", next: "actor", item: "🎭 Маска", points: { art: 4, fun: 3 } },
-                        { title: "🎥 Режиссёр", desc: "Создавать миры", next: "director", item: "🎥 Камера", points: { art: 4, mind: 3 } },
-                        { title: "✍️ Сценарист", desc: "Придумывать истории", next: "screenwriter", item: "📜 Сценарий", points: { mind: 4, art: 3 } },
-                        { title: "📸 Оператор", desc: "Ловить кадр", next: "cameraman", item: "📸 Объектив", points: { art: 3, travel: 2 } }
+                        { title: "🎭 Актёром", desc: "Играть роли", next: "final_actor", item: "🎭 Маска", stats: { искусство: 4, веселье: 3 } },
+                        { title: "🎥 Режиссёром", desc: "Создавать миры", next: "final_director", item: "🎥 Камера", stats: { лидерство: 4, творчество: 4 } },
+                        { title: "✍️ Сценаристом", desc: "Писать истории", next: "final_screenwriter", item: "📜 Сценарий", stats: { ум: 4, творчество: 3 } },
+                        { title: "📸 Оператором", desc: "Ловить кадр", next: "final_cameraman", item: "📸 Объектив", stats: { творчество: 3, путешествия: 2 } }
                     ]
                 },
                 
-                // ===== ЛЮБОВЬ И ОТНОШЕНИЯ =====
-                love1: {
+                // ===== ВЕТКА 5: ЛЮБОВЬ =====
+                love_main: {
                     text: "❤️ Ты ищешь любовь. Где встретишь?",
                     paths: [
-                        { title: "🎓 В университете", desc: "Одногруппник", next: "universityLove", item: "💕 Влюблённость", points: { love: 3 } },
-                        { title: "💼 На работе", desc: "Коллега", next: "workLove", item: "💼 Совещание", points: { love: 2, money: 1 } },
-                        { title: "🌍 В путешествии", desc: "Случайность", next: "travelLove", item: "✈️ Билет", points: { love: 3, travel: 2 } },
-                        { title: "📱 В интернете", desc: "Тиндер", next: "onlineLove", item: "📱 Свайп", points: { love: 2, fun: 2 } }
+                        { title: "🎓 В университете", desc: "Студенческая любовь", next: "love_uni", item: "💕 Влюблённость", stats: { романтика: 3 } },
+                        { title: "💼 На работе", desc: "С коллегой", next: "love_work", item: "💼 Совещание", stats: { любовь: 2, деньги: 1 } },
+                        { title: "🌍 В путешествии", desc: "Случайная встреча", next: "love_travel", item: "✈️ Билет", stats: { приключения: 3, романтика: 2 } },
+                        { title: "📱 В интернете", desc: "Тиндер, соцсети", next: "love_online", item: "📱 Свайп", stats: { веселье: 2, любовь: 2 } },
+                        { title: "👯 Через друзей", desc: "Знакомство в компании", next: "love_friends", item: "🤝 Знакомство", stats: { дружба: 2, любовь: 2 } }
                     ]
                 },
                 
-                universityLove: {
+                love_uni: {
                     text: "🎓 Вы учитесь вместе. Что дальше?",
                     paths: [
-                        { title: "💑 Встречаться", desc: "Романтика", next: "dating", item: "🌹 Свидание", points: { love: 4 } },
-                        { title: "🤝 Дружить", desc: "Надёжный друг", next: "friendLove", item: "🤗 Дружба", points: { social: 4 } },
-                        { title: "📚 Учиться вместе", desc: "Проекты", next: "studyLove", item: "📖 Книга", points: { mind: 3, love: 2 } },
-                        { title: "💔 Пропустить", desc: "Не сейчас", next: "passLove", item: "⏳ Время", points: { calm: 3 } }
+                        { title: "💑 Начать встречаться", desc: "Романтика", next: "final_love_dating", item: "🌹 Свидание", stats: { любовь: 4, романтика: 3 } },
+                        { title: "🤝 Остаться друзьями", desc: "Крепкая дружба", next: "final_love_friends", item: "🤗 Дружба", stats: { дружба: 4, общение: 3 } },
+                        { title: "📚 Вместе учиться", desc: "Общие проекты", next: "final_love_study", item: "📖 Книга", stats: { знания: 3, любовь: 2 } },
+                        { title: "💔 Не сейчас", desc: "Сосредоточиться на себе", next: "final_love_alone", item: "⏳ Время", stats: { спокойствие: 3, гармония: 2 } }
                     ]
                 },
                 
-                // ===== СЕМЬЯ =====
-                family1: {
+                love_travel: {
+                    text: "🌍 Вы встретились в путешествии. Что дальше?",
+                    paths: [
+                        { title: "💑 Путешествовать вместе", desc: "Объездить мир", next: "final_love_travel_together", item: "🗺️ Вдвоём", stats: { путешествия: 4, любовь: 4 } },
+                        { title: "🏠 Создать дом", desc: "Осесть в одном месте", next: "final_love_home", item: "🏡 Гнездо", stats: { спокойствие: 4, забота: 3 } },
+                        { title: "💼 Бизнес вместе", desc: "Общее дело", next: "final_love_business", item: "🤝 Партнёрство", stats: { деньги: 4, успех: 3 } },
+                        { title: "👨‍👩‍👧 Семья", desc: "Завести детей", next: "final_love_family", item: "👶 Ребёнок", stats: { забота: 5, любовь: 4 } }
+                    ]
+                },
+                
+                // ===== ВЕТКА 6: СЕМЬЯ =====
+                family_main: {
                     text: "👨‍👩‍👧 Семья поддержала. Твои мысли?",
                     paths: [
-                        { title: "🏠 Остаться рядом", desc: "Жить с семьёй", next: "stayFamily", item: "🏡 Дом", points: { calm: 3, care: 2 } },
-                        { title: "💼 Помогать им", desc: "Поддержка", next: "helpFamily", item: "🤝 Забота", points: { care: 4 } },
-                        { title: "🚀 Уехать, но звонить", desc: "Свобода", next: "leaveFamily", item: "📞 Телефон", points: { travel: 2, love: 2 } },
-                        { title: "🏛️ Продолжить династию", desc: "Дело семьи", next: "dynasty", item: "🏛️ Наследие", points: { money: 3, care: 2 } }
+                        { title: "🏠 Остаться рядом", desc: "Жить с семьёй", next: "family_stay", item: "🏡 Дом", stats: { спокойствие: 3, забота: 2 } },
+                        { title: "💼 Помогать им", desc: "Поддержка", next: "family_help", item: "🤝 Забота", stats: { забота: 4, помощь: 3 } },
+                        { title: "🚀 Уехать, но звонить", desc: "Свобода", next: "family_leave", item: "📞 Телефон", stats: { путешествия: 2, любовь: 2 } },
+                        { title: "🏛️ Продолжить династию", desc: "Дело семьи", next: "family_dynasty", item: "🏛️ Наследие", stats: { деньги: 3, забота: 2 } },
+                        { title: "👨‍👩‍👧 Создать свою семью", desc: "Женитьба, дети", next: "family_new", item: "💍 Кольцо", stats: { любовь: 4, забота: 3 } }
                     ]
                 },
                 
-                // ===== ДРУЗЬЯ =====
-                friends1: {
+                family_stay: {
+                    text: "🏠 Ты живёшь с семьёй. Как складывается?",
+                    paths: [
+                        { title: "👵 Заботиться о родителях", desc: "Быть рядом в старости", next: "final_family_care", item: "❤️ Забота", stats: { забота: 5, спокойствие: 4 } },
+                        { title: "🏡 Помогать по дому", desc: "Хозяйство, уют", next: "final_family_home", item: "🏠 Уют", stats: { спокойствие: 4, гармония: 3 } },
+                        { title: "👨‍👩‍👧‍👦 Многодетная семья", desc: "Много детей", next: "final_family_many", item: "👶👶 Дети", stats: { радость: 5, забота: 5 } },
+                        { title: "🏛️ Сохранять традиции", desc: "Семейные ценности", next: "final_family_tradition", item: "📜 Традиции", stats: { знания: 3, спокойствие: 4 } }
+                    ]
+                },
+                
+                // ===== ВЕТКА 7: ДРУЗЬЯ =====
+                friends_main: {
                     text: "🤝 Друзья с тобой. Что делаете?",
                     paths: [
-                        { title: "🎉 Тусовки", desc: "Веселиться", next: "partyFriends", item: "🥂 Вечеринка", points: { fun: 4 } },
-                        { title: "💼 Бизнес вместе", desc: "Общее дело", next: "businessFriends", item: "🤝 Партнёрство", points: { money: 4 } },
-                        { title: "🌍 Путешествия", desc: "Вместе в путь", next: "travelFriends", item: "🗺️ Карта", points: { travel: 4 } },
-                        { title: "🏠 Просто быть рядом", desc: "Поддержка", next: "supportFriends", item: "💬 Разговор", points: { calm: 3, care: 2 } }
+                        { title: "🎉 Тусовки", desc: "Веселиться вместе", next: "friends_party", item: "🥂 Вечеринка", stats: { веселье: 4, дружба: 2 } },
+                        { title: "💼 Бизнес вместе", desc: "Общее дело", next: "friends_business", item: "🤝 Партнёрство", stats: { деньги: 4, дружба: 3 } },
+                        { title: "🌍 Путешествия", desc: "Вместе в путь", next: "friends_travel", item: "🗺️ Карта", stats: { путешествия: 4, приключения: 3 } },
+                        { title: "🏠 Просто быть рядом", desc: "Поддержка", next: "friends_support", item: "💬 Разговор", stats: { спокойствие: 3, забота: 2 } },
+                        { title: "🏡 Жить вместе", desc: "Коммуна, хостел", next: "friends_live", item: "🏢 Общага", stats: { общение: 4, веселье: 3 } }
                     ]
                 },
                 
-                // Финальные узлы (более 30 вариантов!)
-                aiStartup: { 
-                    final: true,
-                    text: "🤖 Ты создал успешный AI-стартап!",
-                    type: 'mind',
-                    points: { mind: 10, money: 8 }
+                friends_business: {
+                    text: "💼 Вы решили делать бизнес вместе. Какой?",
+                    paths: [
+                        { title: "☕ Кафе/ресторан", desc: "Общепит", next: "final_friends_cafe", item: "☕ Кофе", stats: { деньги: 4, дружба: 3 } },
+                        { title: "📱 IT-компания", desc: "Технологии", next: "final_friends_it", item: "💻 Код", stats: { ум: 4, деньги: 3 } },
+                        { title: "👕 Магазин одежды", desc: "Мода", next: "final_friends_shop", item: "👕 Одежда", stats: { творчество: 3, деньги: 3 } },
+                        { title: "🏋️ Фитнес-клуб", desc: "Спорт", next: "final_friends_gym", item: "💪 Качалка", stats: { сила: 4, общение: 3 } }
+                    ]
                 },
-                aiCorp: { 
-                    final: true,
-                    text: "🏢 Ты работаешь в ведущей tech-корпорации!",
-                    type: 'money',
-                    points: { money: 10, calm: 5 }
+                
+                friends_travel: {
+                    text: "🌍 Вы отправились в путешествие. Куда?",
+                    paths: [
+                        { title: "🏔️ В горы", desc: "Альпинизм", next: "final_friends_mountains", item: "⛰️ Вершина", stats: { приключения: 4, дружба: 3 } },
+                        { title: "🏖️ На море", desc: "Пляжный отдых", next: "final_friends_sea", item: "🏖️ Пляж", stats: { радость: 4, веселье: 3 } },
+                        { title: "🌍 Вокруг света", desc: "Кругосветка", next: "final_friends_world", item: "🌍 Мир", stats: { путешествия: 5, приключения: 4 } },
+                        { title: "🚗 Автостопом", desc: "Свобода", next: "final_friends_hitch", item: "🚗 Дорога", stats: { приключения: 4, энергия: 3 } }
+                    ]
                 },
-                aiScience: { 
-                    final: true,
-                    text: "🔬 Ты учёный, меняющий мир!",
-                    type: 'mind',
-                    points: { mind: 10, calm: 5 }
+                
+                // ===== ВЕТКА 8: СПОРТ =====
+                sport_main: {
+                    text: "🏆 Ты выбираешь спорт. Какой?",
+                    paths: [
+                        { title: "⚽ Командный", desc: "Футбол, баскетбол", next: "sport_team", item: "⚽ Мяч", stats: { общение: 3, сила: 2 } },
+                        { title: "🥊 Индивидуальный", desc: "Бокс, борьба", next: "sport_individual", item: "🥊 Перчатки", stats: { сила: 3, амбиции: 2 } },
+                        { title: "🏊 Водный", desc: "Плавание, серфинг", next: "sport_water", item: "🏊 Очки", stats: { энергия: 3, здоровье: 2 } },
+                        { title: "🏋️ Силовой", desc: "Тяжёлая атлетика", next: "sport_power", item: "🏋️ Штанга", stats: { сила: 4, амбиции: 2 } },
+                        { title: "🧘 Спокойный", desc: "Йога, стретчинг", next: "sport_calm", item: "🧘 Коврик", stats: { гармония: 3, спокойствие: 2 } }
+                    ]
                 },
-                surgeon: { 
-                    final: true,
-                    text: "💉 Ты спасаешь жизни каждый день!",
-                    type: 'care',
-                    points: { care: 10, mind: 5 }
+                
+                sport_team: {
+                    text: "⚽ Командный спорт. Какая позиция?",
+                    paths: [
+                        { title: "👑 Капитан", desc: "Лидер команды", next: "final_sport_captain", item: "👑 Повязка", stats: { лидерство: 4, успех: 3 } },
+                        { title: "⭐ Звезда", desc: "Лучший игрок", next: "final_sport_star", item: "⭐ Слава", stats: { успех: 4, деньги: 3 } },
+                        { title: "🧠 Стратег", desc: "Умный игрок", next: "final_sport_strategist", item: "📋 Тактика", stats: { ум: 3, лидерство: 2 } },
+                        { title: "❤️ Душа команды", desc: "Поддержка", next: "final_sport_soul", item: "🤗 Команда", stats: { дружба: 4, общение: 3 } }
+                    ]
                 },
-                psych: { 
-                    final: true,
-                    text: "🧠 Ты помогаешь людям обрести душевное равновесие!",
-                    type: 'care',
-                    points: { care: 8, mind: 5, calm: 5 }
+                
+                sport_individual: {
+                    text: "🥊 Индивидуальный спорт. Чего хочешь?",
+                    paths: [
+                        { title: "🏆 Стать чемпионом", desc: "Олимпийское золото", next: "final_sport_champion", item: "🏆 Золото", stats: { успех: 5, сила: 4 } },
+                        { title: "💰 Зарабатывать", desc: "Профессиональный спорт", next: "final_sport_pro", item: "💰 Деньги", stats: { деньги: 4, амбиции: 3 } },
+                        { title: "🧘 Развиваться", desc: "Для себя", next: "final_sport_health", item: "💪 Здоровье", stats: { здоровье: 4, гармония: 3 } },
+                        { title: "👨‍🏫 Тренировать", desc: "Учить других", next: "final_sport_coach", item: "👨‍🏫 Тренер", stats: { забота: 4, знания: 3 } }
+                    ]
                 },
-                manager: { 
+                
+                // ===== ФИНАЛЫ (более 50 вариантов!) =====
+                final_ai_startup: { 
                     final: true,
-                    text: "📊 Ты успешный руководитель отдела!",
-                    type: 'money',
-                    points: { money: 8, social: 5 }
+                    text: "🤖 Ты создал успешный AI-стартап! Твои технологии меняют мир, а инвесторы выстраиваются в очередь. Ты - новый Илон Маск!",
+                    type: 'успех',
+                    stats: { ум: 10, деньги: 8, успех: 5, амбиции: 5 }
                 },
-                financier: { 
+                final_ai_corp: { 
                     final: true,
-                    text: "💰 Ты управляешь миллионами!",
-                    type: 'money',
-                    points: { money: 10, mind: 5 }
+                    text: "🏢 Ты работаешь в ведущей tech-корпорации! Отличная зарплата, престиж, но мало свободы. Зато ты создаёшь технологии будущего!",
+                    type: 'деньги',
+                    stats: { деньги: 10, спокойствие: 5, успех: 5, ум: 5 }
                 },
-                appStartup: { 
+                final_ai_science: { 
                     final: true,
-                    text: "📱 Твоё приложение скачали миллионы!",
-                    type: 'fun',
-                    points: { fun: 8, money: 7, mind: 5 }
+                    text: "🔬 Ты учёный, меняющий мир! Твои открытия печатают в Nature, студенты мечтают попасть к тебе в лабораторию. Ты на переднем крае науки!",
+                    type: 'знания',
+                    stats: { знания: 10, ум: 8, гармония: 5, спокойствие: 3 }
                 },
-                ecoStartup: { 
+                final_ai_freelance: { 
                     final: true,
-                    text: "🌍 Ты спасаешь планету!",
-                    type: 'care',
-                    points: { care: 10, mind: 5 }
+                    text: "🌍 Ты свободный художник в мире IT. Работаешь откуда угодно - с Бали, из Таиланда, из Европы. Твой офис - это весь мир!",
+                    type: 'путешествия',
+                    stats: { путешествия: 8, деньги: 5, веселье: 5, приключения: 4 }
                 },
-                everest: { 
+                
+                final_judge: { 
                     final: true,
-                    text: "🏔️ Ты покорил Эверест!",
-                    type: 'travel',
-                    points: { travel: 10, energy: 8 }
+                    text: "🏛️ Ты судья. Твои решения справедливы и мудры. Люди уважают тебя за честность и принципиальность. Ты - опора правосудия!",
+                    type: 'спокойствие',
+                    stats: { спокойствие: 8, знания: 7, ум: 5, гармония: 4 }
                 },
-                singer: { 
+                final_lawyer: { 
                     final: true,
-                    text: "🎤 Твои песни слушают миллионы!",
-                    type: 'art',
-                    points: { art: 10, fun: 8 }
+                    text: "👔 Ты адвокат. Ты защищаешь невиновных и помогаешь людям в трудных ситуациях. Клиенты тебя обожают, а коллеги уважают!",
+                    type: 'забота',
+                    stats: { забота: 8, ум: 6, деньги: 5, общение: 4 }
                 },
-                bandMember: { 
+                final_investigator: { 
                     final: true,
-                    text: "🎸 Ваша группа собирает стадионы!",
-                    type: 'fun',
-                    points: { fun: 10, art: 7 }
+                    text: "🔍 Ты следователь. Ты раскрыл десятки сложных дел, преступники боятся твоего имени, а обычные люди спят спокойно, зная, что ты на страже!",
+                    type: 'ум',
+                    stats: { ум: 8, приключения: 6, сила: 4, знания: 4 }
                 },
-                composer: { 
+                
+                final_surgeon: { 
                     final: true,
-                    text: "🎼 Твою музыку играют оркестры!",
-                    type: 'art',
-                    points: { art: 10, mind: 5 }
+                    text: "💉 Ты хирург. Ты спасаешь жизни каждый день. Родственники пациентов называют тебя ангелом, а коллеги - мастером золотые руки!",
+                    type: 'забота',
+                    stats: { забота: 10, ум: 7, сила: 5, спокойствие: 4 }
                 },
-                actor: { 
+                final_pediatr: { 
                     final: true,
-                    text: "🎭 Ты звезда кино!",
-                    type: 'art',
-                    points: { art: 9, fun: 8 }
+                    text: "👶 Ты педиатр. Дети тебя обожают, родители тебе доверяют. Ты вылечил тысячи малышей и каждый день делаешь мир чуточку лучше!",
+                    type: 'радость',
+                    stats: { забота: 10, радость: 8, общение: 6, помощь: 5 }
                 },
-                director: { 
+                final_psych: { 
                     final: true,
-                    text: "🎬 Твой фильм получил Оскар!",
-                    type: 'art',
-                    points: { art: 10, mind: 7 }
+                    text: "🧠 Ты психиатр. Ты помогаешь людям обрести душевное равновесие, справиться с тревогой и найти себя. Ты лечишь души!",
+                    type: 'гармония',
+                    stats: { гармония: 8, знания: 7, забота: 6, ум: 5 }
                 },
-                dating: { 
+                
+                final_manager: { 
                     final: true,
-                    text: "💑 Вы вместе уже много лет. Счастливы!",
-                    type: 'love',
-                    points: { love: 10, calm: 5 }
+                    text: "📊 Ты успешный руководитель отдела. Твоя команда - лучшая в компании, показатели растут, начальство довольно. Ты прирождённый лидер!",
+                    type: 'лидерство',
+                    stats: { лидерство: 8, деньги: 6, успех: 5, общение: 4 }
                 },
-                stayFamily: { 
+                final_financier: { 
                     final: true,
-                    text: "🏠 Ты живёшь рядом с семьёй. Тепло и уютно!",
-                    type: 'calm',
-                    points: { calm: 10, love: 5 }
+                    text: "💰 Ты финансист. Ты управляешь миллионами, твои инвестиции всегда удачны, а банкиры с тобой советуются. Деньги любят тебя!",
+                    type: 'деньги',
+                    stats: { деньги: 10, ум: 7, успех: 6, спокойствие: 3 }
                 },
-                partyFriends: { 
+                final_marketer: { 
                     final: true,
-                    text: "🥂 Ты душа компании! Все хотят с тобой дружить!",
-                    type: 'fun',
-                    points: { fun: 10, social: 8 }
+                    text: "📈 Ты маркетолог. Твои рекламные кампании становятся вирусными, продажи растут, бренды мечтают с тобой работать. Ты понимаешь людей!",
+                    type: 'творчество',
+                    stats: { творчество: 8, деньги: 7, общение: 6, веселье: 4 }
                 },
-                businessFriends: { 
+                final_hr: { 
                     final: true,
-                    text: "🤝 Вы создали бизнес-империю вместе!",
-                    type: 'money',
-                    points: { money: 10, social: 7 }
+                    text: "🤝 Ты HR-менеджер. Ты нашёл работу сотням людей, создал лучшую команду в компании. Коллеги говорят, что ты чувствуешь людей!",
+                    type: 'общение',
+                    stats: { общение: 8, забота: 6, дружба: 5, успех: 4 }
                 },
-                travelFriends: { 
+                
+                final_app_startup: { 
                     final: true,
-                    text: "🌍 Вы объездили полмира! И это только начало!",
-                    type: 'travel',
-                    points: { travel: 10, fun: 7 }
+                    text: "📱 Твоё приложение скачали миллионы! Ты создал сервис, которым пользуются каждый день. Ты изменил жизнь людей к лучшему!",
+                    type: 'успех',
+                    stats: { успех: 8, деньги: 7, ум: 6, веселье: 4 }
                 },
-                python: { 
+                final_eco_startup: { 
                     final: true,
-                    text: "🐍 Ты стал гуру Python! Тебя приглашают во все компании!",
-                    type: 'mind',
-                    points: { mind: 8, money: 5 }
+                    text: "🌍 Ты спасаешь планету! Твой экологический проект очищает океаны, сажает леса, уменьшает выбросы. Ты - герой Земли!",
+                    type: 'забота',
+                    stats: { забота: 10, гармония: 7, помощь: 6, знания: 4 }
                 },
-                java: { 
+                final_edu_startup: { 
                     final: true,
-                    text: "☕ Ты корпоративный разработчик. Стабильность и деньги!",
-                    type: 'money',
-                    points: { money: 8, mind: 5 }
+                    text: "🎓 Твой образовательный проект учит миллионы людей. Ты даёшь знания тем, кто в них нуждается. Ты меняешь образование!",
+                    type: 'знания',
+                    stats: { знания: 9, забота: 7, ум: 6, успех: 4 }
                 },
-                js: { 
+                
+                final_everest: { 
                     final: true,
-                    text: "🌐 Ты создаёшь крутые сайты. Фриланс и свобода!",
-                    type: 'fun',
-                    points: { fun: 7, money: 5 }
+                    text: "🏔️ Ты покорил Эверест! Нет вершин, которые ты не сможешь взять. Ты доказал себе и миру, что невозможное возможно!",
+                    type: 'сила',
+                    stats: { сила: 10, приключения: 9, энергия: 8, путешествия: 6 }
                 },
-                gamedev: { 
+                final_surfer: { 
                     final: true,
-                    text: "🎮 Ты делаешь игры, в которые играют миллионы!",
-                    type: 'fun',
-                    points: { fun: 9, mind: 6 }
+                    text: "🏄 Ты стал профессиональным серфером. Ты объездил лучшие волны мира, участвуешь в соревнованиях и живёшь в гармонии с океаном!",
+                    type: 'веселье',
+                    stats: { веселье: 9, путешествия: 8, энергия: 7, приключения: 6 }
                 },
-                judge: { 
+                final_mountain_guide: { 
                     final: true,
-                    text: "🏛️ Ты судья. Твои решения справедливы!",
-                    type: 'calm',
-                    points: { calm: 8, mind: 7 }
+                    text: "🗺️ Ты горный гид. Ты водишь людей к вершинам, делишься любовью к горам и чувствуешь себя частью природы. Твоя жизнь - в горах!",
+                    type: 'общение',
+                    stats: { общение: 7, путешествия: 8, спокойствие: 6, гармония: 5 }
                 },
-                pediatric: { 
+                
+                final_singer: { 
                     final: true,
-                    text: "👶 Ты лечишь детей. Ты их герой!",
-                    type: 'care',
-                    points: { care: 10, fun: 5 }
+                    text: "🎤 Твои песни слушают миллионы! Ты собираешь стадионы, твои треки в топах, а фанаты ночуют под дверью. Ты - звезда!",
+                    type: 'искусство',
+                    stats: { искусство: 10, успех: 9, деньги: 8, веселье: 7 }
                 },
-                musicTeacher: { 
+                final_band: { 
                     final: true,
-                    text: "🏫 Ты учишь детей музыке. Они тебя обожают!",
-                    type: 'care',
-                    points: { care: 8, art: 6 }
+                    text: "🎸 Ваша группа собирает стадионы! Вы - лучшие друзья и коллеги, ваша музыка вдохновляет поколения. Рок-н-ролл жив!",
+                    type: 'веселье',
+                    stats: { веселье: 9, дружба: 8, творчество: 7, искусство: 6 }
                 },
-                photographer: { 
+                final_composer: { 
                     final: true,
-                    text: "📸 Твои фотографии выставляют в галереях!",
-                    type: 'art',
-                    points: { art: 8, travel: 6 }
+                    text: "🎼 Твою музыку играют оркестры по всему миру! Ты пишешь саундтреки к фильмам, симфонии и просто гениальные мелодии.",
+                    type: 'творчество',
+                    stats: { творчество: 10, искусство: 9, ум: 7, гармония: 6 }
+                },
+                final_actor: { 
+                    final: true,
+                    text: "🎭 Ты звезда кино! Твои роли помнят и любят, режиссёры мечтают с тобой работать, а зрители ждут каждый твой фильм.",
+                    type: 'искусство',
+                    stats: { искусство: 9, успех: 8, веселье: 7, деньги: 6 }
+                },
+                final_director: { 
+                    final: true,
+                    text: "🎬 Твой фильм получил Оскар! Ты гений режиссуры, твой стиль узнаваем, а актёры считают за честь сниматься у тебя.",
+                    type: 'лидерство',
+                    stats: { лидерство: 9, творчество: 8, искусство: 7, ум: 6 }
+                },
+                
+                final_love_dating: { 
+                    final: true,
+                    text: "💑 Вы вместе уже много лет. Ваша любовь только крепнет, вы прошли через всё и стали друг для друга всем миром. Счастливы!",
+                    type: 'любовь',
+                    stats: { любовь: 10, спокойствие: 7, романтика: 6, радость: 5 }
+                },
+                final_love_travel_together: { 
+                    final: true,
+                    text: "🌍 Вы путешествуете вдвоём по миру. Каждый год новая страна, новые приключения, но вместе. Ваш дом - весь мир!",
+                    type: 'путешествия',
+                    stats: { путешествия: 9, любовь: 8, приключения: 7, романтика: 6 }
+                },
+                final_love_family: { 
+                    final: true,
+                    text: "👨‍👩‍👧 Вы создали прекрасную семью. У вас замечательные дети, уютный дом и много любви. Вы - пример для подражания!",
+                    type: 'забота',
+                    stats: { забота: 9, любовь: 8, спокойствие: 7, радость: 6 }
+                },
+                
+                final_family_care: { 
+                    final: true,
+                    text: "👵 Ты заботишься о родителях. Они гордятся тобой, ты всегда рядом, и в семье царит любовь и гармония. Ты - опора!",
+                    type: 'забота',
+                    stats: { забота: 10, спокойствие: 7, гармония: 6, любовь: 5 }
+                },
+                final_family_many: { 
+                    final: true,
+                    text: "👨‍👩‍👧‍👦 У тебя большая семья! Пять детей, шумный дом, постоянное движение. Ты счастлив в этом круговороте любви!",
+                    type: 'радость',
+                    stats: { радость: 9, забота: 8, веселье: 7, любовь: 6 }
+                },
+                
+                final_friends_cafe: { 
+                    final: true,
+                    text: "☕ Вы с друзьями открыли уютное кафе. Теперь это место встречи для многих, а вы не только бизнес-партнёры, но и лучшие друзья!",
+                    type: 'дружба',
+                    stats: { дружба: 8, деньги: 7, общение: 6, веселье: 5 }
+                },
+                final_friends_world: { 
+                    final: true,
+                    text: "🌍 Вы с друзьями отправились в кругосветное путешествие! Вы объездили 50 стран, пережили сотни приключений и стали ещё ближе!",
+                    type: 'путешествия',
+                    stats: { путешествия: 10, дружба: 9, приключения: 8, веселье: 7 }
+                },
+                
+                final_sport_champion: { 
+                    final: true,
+                    text: "🏆 Ты олимпийский чемпион! Золотая медаль, гимн страны, флаг над головой. Ты достиг вершин в спорте!",
+                    type: 'успех',
+                    stats: { успех: 10, сила: 9, амбиции: 8, энергия: 7 }
+                },
+                final_sport_captain: { 
+                    final: true,
+                    text: "👑 Ты капитан команды! Ты ведёшь за собой, вдохновляешь, поддерживаешь. Твоя команда - как семья!",
+                    type: 'лидерство',
+                    stats: { лидерство: 9, дружба: 8, общение: 7, успех: 6 }
+                },
+                final_sport_coach: { 
+                    final: true,
+                    text: "👨‍🏫 Ты стал тренером. Ты воспитал чемпионов, твои ученики тебя обожают, а ты получаешь радость от того, что даёшь другим!",
+                    type: 'забота',
+                    stats: { забота: 8, знания: 7, общение: 6, радость: 5 }
                 }
             };
 
-            // Финальные типы для подсчёта
+            // ==================== ФИНАЛЬНЫЕ ТИПЫ ====================
             const finals = {
-                mind: { emoji: '🧠', title: 'МЫСЛИТЕЛЬ', desc: 'Твой интеллект - твоя суперсила!' },
-                money: { emoji: '👑', title: 'ЛИДЕР', desc: 'Ты добился успеха и признания!' },
-                travel: { emoji: '✈️', title: 'ПУТЕШЕСТВЕННИК', desc: 'Мир - твой дом, ты везде как рыба в воде!' },
-                art: { emoji: '🎨', title: 'ТВОРЕЦ', desc: 'Ты создаёшь прекрасное и вдохновляешь других!' },
-                care: { emoji: '❤️', title: 'ЗАБОТЛИВЫЙ', desc: 'Ты делаешь мир лучше, помогая другим!' },
-                fun: { emoji: '🎉', title: 'ЗАЖИГАТЕЛЬ', desc: 'С тобой никогда не скучно, ты заражаешь радостью!' },
-                calm: { emoji: '🧘', title: 'МУДРЕЦ', desc: 'Ты нашёл гармонию и внутренний покой!' },
-                social: { emoji: '👥', title: 'ДУША КОМПАНИИ', desc: 'Тебя любят и ценят за умение дружить!' },
-                love: { emoji: '💑', title: 'РОМАНТИК', desc: 'Ты умеешь любить и быть любимым!' },
-                energy: { emoji: '⚡', title: 'ВЕЧНЫЙ ДВИГАТЕЛЬ', desc: 'Твоя энергия заражает всех вокруг!' }
+                ум: { emoji: '🧠', title: 'МЫСЛИТЕЛЬ', desc: 'Твой интеллект - твоя суперсила! Ты видишь решения там, где другие видят проблемы.' },
+                знания: { emoji: '📚', title: 'ЭРУДИТ', desc: 'Ты копил знания всю жизнь, и теперь они открывают любые двери!' },
+                деньги: { emoji: '💰', title: 'МАГНАТ', desc: 'Ты умеешь зарабатывать и приумножать. Финансы текут к тебе рекой.' },
+                успех: { emoji: '👑', title: 'ЛИДЕР', desc: 'Ты добился успеха и признания! Тобой восхищаются и тебя уважают.' },
+                путешествия: { emoji: '✈️', title: 'ПУТЕШЕСТВЕННИК', desc: 'Мир - твой дом. Ты везде как рыба в воде и всегда открыт новому.' },
+                приключения: { emoji: '🎢', title: 'АВАНТЮРИСТ', desc: 'Жизнь без риска - не жизнь. Ты всегда там, где интересно!' },
+                творчество: { emoji: '🎨', title: 'ТВОРЕЦ', desc: 'Ты создаёшь прекрасное и вдохновляешь других своим талантом.' },
+                искусство: { emoji: '🎭', title: 'АРТИСТ', desc: 'Ты живёшь искусством и даришь его людям. Ты - украшение мира.' },
+                забота: { emoji: '❤️', title: 'ЗАБОТЛИВЫЙ', desc: 'Ты делаешь мир лучше, помогая другим. Твоё сердце полно тепла.' },
+                помощь: { emoji: '🤝', title: 'ПОМОЩНИК', desc: 'На тебя всегда можно положиться. Ты первый придёшь на выручку.' },
+                веселье: { emoji: '🎉', title: 'ЗАЖИГАТЕЛЬ', desc: 'С тобой никогда не скучно! Ты заражаешь всех своей радостью.' },
+                радость: { emoji: '😊', title: 'ОПТИМИСТ', desc: 'Ты видишь хорошее во всём. Твой позитив заразителен!' },
+                спокойствие: { emoji: '🧘', title: 'МУДРЕЦ', desc: 'Ты нашёл гармонию и внутренний покой. Ты - островок стабильности.' },
+                гармония: { emoji: '☯️', title: 'ФИЛОСОФ', desc: 'Ты понимаешь баланс мира. Твоя мудрость помогает другим.' },
+                общение: { emoji: '👥', title: 'КОММУНИКАТОР', desc: 'Ты умеешь находить общий язык с кем угодно. Ты - связующее звено.' },
+                дружба: { emoji: '🤗', title: 'ДРУГ', desc: 'Тебя любят и ценят за умение дружить. Ты - надёжное плечо.' },
+                любовь: { emoji: '💑', title: 'РОМАНТИК', desc: 'Ты умеешь любить и быть любимым. Твоё сердце всегда открыто.' },
+                романтика: { emoji: '💕', title: 'МЕЧТАТЕЛЬ', desc: 'Ты веришь в настоящую любовь и создаёшь её вокруг себя.' },
+                энергия: { emoji: '⚡', title: 'ВЕЧНЫЙ ДВИГАТЕЛЬ', desc: 'Твоя энергия заражает всех вокруг! Ты успеваешь всё и даже больше.' },
+                сила: { emoji: '💪', title: 'СИЛАЧ', desc: 'Ты силён духом и телом. Никакие преграды тебя не остановят.' },
+                лидерство: { emoji: '👑', title: 'ВОЖАК', desc: 'Ты рождён вести за собой. Люди идут за тобой.' },
+                амбиции: { emoji: '🚀', title: 'ЧЕСТОЛЮБЕЦ', desc: 'Ты ставишь высокие цели и всегда их достигаешь. У тебя большое будущее.' }
             };
 
             let currentNode = 'start';
             let inventory = [];
             let scores = {
-                mind:0, money:0, travel:0, art:0, care:0, 
-                fun:0, calm:0, social:0, love:0, energy:0
+                ум: 0, знания: 0, деньги: 0, успех: 0,
+                путешествия: 0, приключения: 0,
+                творчество: 0, искусство: 0,
+                забота: 0, помощь: 0,
+                веселье: 0, радость: 0,
+                спокойствие: 0, гармония: 0,
+                общение: 0, дружба: 0,
+                любовь: 0, романтика: 0,
+                энергия: 0, сила: 0,
+                лидерство: 0, амбиции: 0
             };
             
             let pathHistory = [];
             let stepCount = 0;
-            const totalSteps = 20; // Для прогресс-бара
+            const totalSteps = 20;
 
             function updateProgress() {
                 let percent = (stepCount / totalSteps) * 100;
@@ -598,7 +757,6 @@
             function renderNode(nodeId) {
                 let node = questTree[nodeId];
                 if (!node) {
-                    // Если узел не найден, показываем финал с накопленными баллами
                     showFinalResult();
                     return;
                 }
@@ -607,30 +765,31 @@
                 updateProgress();
                 pathHistory.push(nodeId);
 
-                // Если это финальный узел
                 if (node.final) {
-                    // Добавляем финальные очки
-                    if (node.points) {
-                        Object.keys(node.points).forEach(k => {
-                            if (scores[k] !== undefined) scores[k] += node.points[k];
+                    if (node.stats) {
+                        Object.keys(node.stats).forEach(k => {
+                            if (scores[k] !== undefined) scores[k] += node.stats[k];
                         });
                     }
-                    // Определяем тип финала
                     let finalType = node.type || Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
                     showFinalResult(finalType, node.text);
                     return;
                 }
 
-                // Обычный узел с выбором
+                let statsHtml = '';
+                Object.entries(scores).forEach(([key, value]) => {
+                    if (value > 0) {
+                        statsHtml += `<span class="stat-badge">${stats[key]?.name || key}: ${value}</span>`;
+                    }
+                });
+
                 let html = `
                     <div class="question-text">${node.text}</div>
                     <div class="inventory">
                         <strong>🎒 Инвентарь:</strong> ${inventory.length ? inventory.join(' · ') : 'пока пусто'}
                     </div>
                     <div class="stats">
-                        ${Object.entries(scores).filter(([_, v]) => v > 0).map(([k, v]) => 
-                            `<span class="stat-badge">${k}: ${v}</span>`
-                        ).join('')}
+                        ${statsHtml}
                     </div>
                     <div class="path-container">
                 `;
@@ -640,7 +799,7 @@
                         <div class="path-card" 
                              data-next="${path.next}" 
                              data-item="${path.item || ''}" 
-                             data-points='${JSON.stringify(path.points || {})}'>
+                             data-stats='${JSON.stringify(path.stats || {})}'>
                             <div class="path-emoji">${path.title.split(' ')[0]}</div>
                             <div class="path-title">${path.title}</div>
                             <div class="path-desc">${path.desc}</div>
@@ -648,41 +807,32 @@
                     `;
                 });
 
-                html += `</div>`;
-                
-                // Кнопка "Начать заново" всегда доступна
-                html += `<button class="action-button" id="restartBtn">🔄 Начать заново</button>`;
-                
+                html += `</div><button class="action-button" id="restartBtn">🔄 Начать заново</button>`;
                 gameArea.innerHTML = html;
 
-                // Обработчики для карточек
                 document.querySelectorAll('.path-card').forEach(card => {
                     card.addEventListener('click', function() {
                         let next = this.dataset.next;
                         let item = this.dataset.item;
-                        let points = JSON.parse(this.dataset.points);
+                        let stats = JSON.parse(this.dataset.stats);
 
                         if (item) {
                             inventory.push(item);
                         }
 
-                        Object.keys(points).forEach(k => {
-                            if (scores[k] !== undefined) scores[k] += points[k];
+                        Object.keys(stats).forEach(k => {
+                            if (scores[k] !== undefined) scores[k] += stats[k];
                         });
 
                         if (next && questTree[next]) {
                             renderNode(next);
                         } else {
-                            // Если следующего узла нет, показываем финал
                             showFinalResult();
                         }
                     });
                 });
 
-                // Кнопка рестарта
-                document.getElementById('restartBtn').addEventListener('click', () => {
-                    resetGame();
-                });
+                document.getElementById('restartBtn').addEventListener('click', resetGame);
             }
 
             function showFinalResult(specificType = null, finalText = null) {
@@ -691,19 +841,17 @@
                     maxType = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
                 }
                 
-                let f = finals[maxType] || finals.mind;
+                let f = finals[maxType] || finals.ум;
                 
-                // Подсчёт очков
                 let totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
                 
-                // Топ-3 качества
                 let topStats = Object.entries(scores)
                     .filter(([_, v]) => v > 0)
                     .sort((a, b) => b[1] - a[1])
                     .slice(0, 3);
 
                 let statsHtml = topStats.map(([k, v]) => 
-                    `<span class="stat-badge">${k}: ${'⭐'.repeat(Math.min(5, Math.ceil(v/5)))}</span>`
+                    `<span class="stat-badge">${finals[k]?.title || k}: ${'⭐'.repeat(Math.min(5, Math.ceil(v/5)))}</span>`
                 ).join(' ');
 
                 gameArea.innerHTML = `
@@ -738,17 +886,23 @@
                     </div>
                 `;
 
-                document.getElementById('finalRestartBtn').addEventListener('click', () => {
-                    resetGame();
-                });
+                document.getElementById('finalRestartBtn').addEventListener('click', resetGame);
             }
 
             function resetGame() {
                 currentNode = 'start';
                 inventory = [];
                 scores = {
-                    mind:0, money:0, travel:0, art:0, care:0, 
-                    fun:0, calm:0, social:0, love:0, energy:0
+                    ум: 0, знания: 0, деньги: 0, успех: 0,
+                    путешествия: 0, приключения: 0,
+                    творчество: 0, искусство: 0,
+                    забота: 0, помощь: 0,
+                    веселье: 0, радость: 0,
+                    спокойствие: 0, гармония: 0,
+                    общение: 0, дружба: 0,
+                    любовь: 0, романтика: 0,
+                    энергия: 0, сила: 0,
+                    лидерство: 0, амбиции: 0
                 };
                 pathHistory = [];
                 stepCount = 0;
@@ -756,10 +910,8 @@
                 renderNode('start');
             }
 
-            // Старт игры
             renderNode('start');
 
-            // Автомузыка
             document.addEventListener('touchstart', () => { 
                 if(music.paused) music.play().catch(()=>{}); 
             }, { once: true });
