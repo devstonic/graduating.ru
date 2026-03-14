@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎓 Квест выпускника: Большая жизнь</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .music-btn { 
+            position: fixed; 
+            top: max(16px, env(safe-area-inset-top));
+            right: max(16px, env(safe-area-inset-right));
+            width: 52px; height: 52px; border-radius: 30px; 
+            background: rgba(255,255,255,0.25); backdrop-filter: blur(15px); 
+            border: 2px solid white; color: white; font-size: 26px; 
+            display: flex; align-items: center; justify-content: center; 
+            z-index: 1000; cursor: pointer;
+        }
+        .wrapper { 
+            width: 100%; max-width: 480px; margin: 0 auto; 
+            padding: max(20px, env(safe-area-inset-top)) 16px max(20px, env(safe-area-inset-bottom)) 16px; 
+            min-height: 100vh; display: flex; align-items: center; 
+        }
+        .card { 
+            width: 100%; background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); 
+            border-radius: 48px; padding: 28px 20px; 
+            border: 1px solid rgba(255,255,255,0.6); 
+            box-shadow: 0 25px 50px -8px rgba(0,0,0,0.3);
+        }
+        .greeting { font-size: clamp(1.5rem,6vw,2rem); color: white; text-align: center; }
+        .holiday-name { font-size: clamp(2rem,8vw,2.8rem); color: white; text-align: center; font-weight: 900; }
+        .divider { height: 3px; background: linear-gradient(90deg, transparent, white, transparent); width: 70%; margin: 15px auto; }
+        
+        .progress {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.2); border-radius: 20px;
+            margin: 20px 0; overflow: hidden;
+        }
+        .progress-bar { height: 100%; background: white; width: 0%; transition: width 0.3s; border-radius: 20px; }
+        
+        .path-container { display: flex; flex-direction: column; gap: 15px; margin: 20px 0; }
+        .path-card {
+            background: rgba(255,255,255,0.2); border: 2px solid white; border-radius: 30px;
+            padding: 20px; cursor: pointer; transition: all 0.2s;
+        }
+        .path-card:active { background: rgba(255,255,255,0.4); transform: scale(0.98); }
+        .path-emoji { font-size: 2.5rem; text-align: center; }
+        .path-title { font-size: 1.4rem; color: white; text-align: center; margin: 8px 0; }
+        .path-desc { font-size: 1rem; color: rgba(255,255,255,0.8); text-align: center; }
+        
+        .question-text { 
+            font-size: 1.6rem; color: white; text-align: center; 
+            background: rgba(0,0,0,0.2); border-radius: 40px; padding: 20px;
+            margin-bottom: 20px; border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .inventory {
+            background: rgba(0,0,0,0.3); border-radius: 30px; padding: 15px;
+            margin: 15px 0; color: white; border: 2px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        .stats {
+            display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+            margin: 15px 0;
+        }
+        .stat-badge {
+            background: rgba(255,255,255,0.15); border-radius: 30px; padding: 8px 16px;
+            color: white; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .action-button {
+            width: 100%; background: rgba(255,255,255,0.25);
+            border: 3px solid white; border-radius: 60px; padding: 18px;
+            color: white; font-size: 1.3rem; margin: 15px 0; cursor: pointer;
+            font-weight: 700; backdrop-filter: blur(10px);
+        }
+        .action-button:active { background: rgba(255,255,255,0.4); transform: scale(0.97); }
+        
+        .final-result { text-align: center; color: white; animation: fadeIn 0.6s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .final-emoji { font-size: 5rem; margin: 20px 0; }
+        .final-title { font-size: 2.5rem; font-weight: 900; margin: 15px 0; }
+        .final-desc { font-size: 1.2rem; margin: 20px 0; line-height: 1.5; }
+    </style>
+</head>
+<body>
+    <div class="music-btn" id="musicToggle">🔊</div>
+    <audio id="bgMusic" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3">
+    </audio>
+    
+    <div class="wrapper">
+        <div class="card" id="app">
+            <div class="greeting">🎓 Выпускной</div>
+            <div class="holiday-name">КВЕСТ: БОЛЬШАЯ ЖИЗНЬ</div>
+            <div class="divider"></div>
+            <div class="progress">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div id="gameArea"></div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const music = document.getElementById('bgMusic');
+            const musicBtn = document.getElementById('musicToggle');
+            music.volume = 0.3;
+            musicBtn.onclick = () => {
+                if(music.paused) { music.play(); musicBtn.textContent = '🔊'; }
+                else { music.pause(); musicBtn.textContent = '🔇'; }
+            };
+
+            const gameArea = document.getElementById('gameArea');
+            const progressBar = document.getElementById('progressBar');
+            
+            // ==================== РАСШИРЕННОЕ ДЕРЕВО КВЕСТА ====================
+            const questTree = {
+                // Уровень 1: Начало
+                start: {
+                    id: 'start',
+                    text: "🎓 Школа позади. Какое у тебя настроение?",
+                    paths: [
+                        { 
+                            title: "🌟 Воодушевлённое", 
+                            desc: "Весь мир открыт!",
+                            next: "excited",
+                            item: "✨ Энтузиазм",
+                            points: { fun: 3, energy: 2 }
+                        },
+                        { 
+                            title: "😨 Немного страшно", 
+                            desc: "Всё так неизвестно",
+                            next: "scared",
+                            item: "😰 Смелость",
+                            points: { mind: 2, calm: 2 }
+                        },
+                        { 
+                            title: "🤔 Задумчивое", 
+                            desc: "Надо всё обдумать",
+                            next: "thoughtful",
+                            item: "📝 План",
+                            points: { mind: 3, calm: 1 }
+                        },
+                        { 
+                            title: "🎉 Хочется праздника", 
+                            desc: "Отдохнуть перед будущим",
+                            next: "party",
+                            item: "🥂 Веселье",
+                            points: { fun: 3, social: 2 }
+                        }
+                    ]
+                },
+                
+                // Уровень 2: Ветка "Воодушевлённое"
+                excited: {
+                    id: 'excited',
+                    text: "🔥 Ты полон энергии! Куда направишь её?",
+                    paths: [
+                        { title: "🏛️ Университет", desc: "Покорять науку", next: "university1", item: "🎓 Абитуриент", points: { mind: 2 } },
+                        { title: "💼 Работа", desc: "Зарабатывать", next: "work1", item: "💪 Трудолюбие", points: { money: 2 } },
+                        { title: "✈️ Путешествия", desc: "Искать приключения", next: "travel1", item: "🌍 Билет", points: { travel: 3 } },
+                        { title: "🎨 Творчество", desc: "Создавать", next: "art1", item: "🎨 Вдохновение", points: { art: 3 } }
+                    ]
+                },
+                
+                // Уровень 2: Ветка "Страшно"
+                scared: {
+                    id: 'scared',
+                    text: "😰 Страх - это нормально. Что поможет?",
+                    paths: [
+                        { title: "👨‍👩‍👧 Семья", desc: "Поддержка родных", next: "family1", item: "💝 Любовь", points: { care: 3 } },
+                        { title: "🤝 Друзья", desc: "Вместе веселее", next: "friends1", item: "👥 Дружба", points: { social: 3 } },
+                        { title: "📚 Книги", desc: "Набраться знаний", next: "books1", item: "📖 Мудрость", points: { mind: 3 } },
+                        { title: "🧘 Самоанализ", desc: "Понять себя", next: "self1", item: "🧠 Осознанность", points: { calm: 3 } }
+                    ]
+                },
+                
+                // Уровень 2: Ветка "Задумчивое"
+                thoughtful: {
+                    id: 'thoughtful',
+                    text: "🤔 Ты любишь планировать. Что в приоритете?",
+                    paths: [
+                        { title: "💰 Карьера", desc: "Достичь высот", next: "career1", item: "📈 Амбиции", points: { money: 3 } },
+                        { title: "❤️ Отношения", desc: "Найти любовь", next: "love1", item: "💕 Романтика", points: { love: 3 } },
+                        { title: "🌍 Мир", desc: "Понять устройство", next: "world1", item: "🌐 Кругозор", points: { mind: 3 } },
+                        { title: "🏠 Дом", desc: "Создать уют", next: "home1", item: "🏡 Уют", points: { calm: 3 } }
+                    ]
+                },
+                
+                // Уровень 2: Ветка "Хочется праздника"
+                party: {
+                    id: 'party',
+                    text: "🎉 Вечеринка удалась! Что дальше?",
+                    paths: [
+                        { title: "🎪 Фестиваль", desc: "Ещё веселья", next: "festival1", item: "🎭 Маска", points: { fun: 3 } },
+                        { title: "🏖️ Отпуск", desc: "Расслабиться", next: "vacation1", item: "🍹 Коктейль", points: { fun: 2, calm: 2 } },
+                        { title: "💃 Танцы", desc: "Развивать талант", next: "dance1", item: "💃 Грация", points: { art: 3 } },
+                        { title: "🥁 Музыка", desc: "Играть в группе", next: "band1", item: "🎸 Гитара", points: { art: 3, fun: 2 } }
+                    ]
+                },
+                
+                // ===== УНИВЕРСИТЕТСКАЯ ВЕТКА (глубокая) =====
+                university1: {
+                    id: 'university1',
+                    text: "🏛️ Какой факультет привлекает?",
+                    paths: [
+                        { title: "💻 IT", desc: "Программирование", next: "it1", item: "⌨️ Клавиатура", points: { mind: 3 } },
+                        { title: "⚖️ Юридический", desc: "Защита прав", next: "law1", item: "⚖️ Фемида", points: { mind: 2, money: 2 } },
+                        { title: "🎨 Искусств", desc: "Творчество", next: "artUni", item: "🎨 Палитра", points: { art: 3 } },
+                        { title: "🏥 Медицина", desc: "Помощь людям", next: "med1", item: "🩺 Стетоскоп", points: { care: 3 } }
+                    ]
+                },
+                
+                it1: {
+                    text: "💻 Программирование. Какой язык выберешь?",
+                    paths: [
+                        { title: "🐍 Python", desc: "Анализ данных", next: "python", item: "📊 Данные", points: { mind: 4 } },
+                        { title: "☕ Java", desc: "Корпоративная разработка", next: "java", item: "🏢 Энтерпрайз", points: { money: 4 } },
+                        { title: "🌐 JavaScript", desc: "Веб-сайты", next: "js", item: "🌍 Сайты", points: { fun: 3, mind: 2 } },
+                        { title: "📱 Mobile", desc: "Приложения", next: "mobile", item: "📱 Приложение", points: { money: 3, mind: 3 } }
+                    ]
+                },
+                
+                python: {
+                    text: "🐍 Python. Куда пойти работать?",
+                    paths: [
+                        { title: "🤖 AI", desc: "Нейросети", next: "ai", item: "🧠 ИИ", points: { mind: 5, money: 3 } },
+                        { title: "📈 Data Science", desc: "Аналитика", next: "datascience", item: "📊 Анализ", points: { mind: 5, money: 4 } },
+                        { title: "🕸️ Web", desc: "Сайты на Django", next: "django", item: "🌐 Сайт", points: { mind: 3, money: 3 } },
+                        { title: "🎮 Игры", desc: "Геймдев", next: "gamedev", item: "🎮 Игра", points: { fun: 4, mind: 3 } }
+                    ]
+                },
+                
+                ai: {
+                    text: "🤖 Ты создаёшь ИИ будущего!",
+                    paths: [
+                        { title: "🚀 Стартап", desc: "Своя компания", next: "aiStartup", item: "💡 Идея", points: { money: 5, mind: 5 } },
+                        { title: "🏢 Корпорация", desc: "Работа в Google", next: "aiCorp", item: "💼 Офис", points: { money: 5, calm: 3 } },
+                        { title: "📚 Наука", desc: "Исследования", next: "aiScience", item: "🔬 Лаборатория", points: { mind: 5, calm: 4 } },
+                        { title: "🌍 Свобода", desc: "Фриланс", next: "aiFree", item: "🏝️ Ноутбук", points: { travel: 4, money: 3 } }
+                    ]
+                },
+                
+                law1: {
+                    text: "⚖️ Юриспруденция. Какая сфера?",
+                    paths: [
+                        { title: "🏢 Корпоративное право", desc: "Бизнес", next: "corpLaw", item: "📑 Контракт", points: { money: 4 } },
+                        { title: "👤 Адвокат", desc: "Защита людей", next: "advocate", item: "⚖️ Право", points: { care: 4 } },
+                        { title: "🔍 Следователь", desc: "Расследования", next: "investigator", item: "🔎 Лупа", points: { mind: 4 } },
+                        { title: "🏛️ Судья", desc: "Правосудие", next: "judge", item: "🔨 Молоток", points: { mind: 4, calm: 3 } }
+                    ]
+                },
+                
+                med1: {
+                    text: "🏥 Медицина. Какая специализация?",
+                    paths: [
+                        { title: "💉 Хирург", desc: "Спасать жизни", next: "surgeon", item: "🔪 Скальпель", points: { care: 5, mind: 4 } },
+                        { title: "🧠 Психиатр", desc: "Лечить душу", next: "psych", item: "🧠 Мозг", points: { mind: 4, care: 4 } },
+                        { title: "👶 Педиатр", desc: "Лечить детей", next: "pediatric", item: "🍼 Дети", points: { care: 5, fun: 3 } },
+                        { title: "🚑 Скорая", desc: "На передовой", next: "ambulance", item: "🚑 Фельдшер", points: { care: 4, energy: 4 } }
+                    ]
+                },
+                
+                // ===== РАБОЧАЯ ВЕТКА =====
+                work1: {
+                    text: "💼 Работа. В какой сфере?",
+                    paths: [
+                        { title: "👔 Офис", desc: "Бизнес-центр", next: "office1", item: "👔 Галстук", points: { money: 3 } },
+                        { title: "🚀 Стартап", desc: "Своё дело", next: "startup1", item: "🚀 Идея", points: { money: 2, fun: 2 } },
+                        { title: "👨‍🏫 Образование", desc: "Учить детей", next: "teacher1", item: "📚 Учебник", points: { care: 3 } },
+                        { title: "👨‍🔧 Производство", desc: "Реальный сектор", next: "factory1", item: "🔧 Инструмент", points: { skill: 3 } }
+                    ]
+                },
+                
+                office1: {
+                    text: "👔 Офис. Кем устроишься?",
+                    paths: [
+                        { title: "📊 Менеджер", desc: "Управление", next: "manager", item: "📋 План", points: { money: 3 } },
+                        { title: "💰 Финансист", desc: "Деньги", next: "financier", item: "💰 Деньги", points: { money: 4, mind: 2 } },
+                        { title: "📈 Маркетолог", desc: "Реклама", next: "marketer", item: "📱 Реклама", points: { fun: 3, money: 3 } },
+                        { title: "🤝 HR", desc: "Поиск людей", next: "hr", item: "👥 Команда", points: { social: 3, care: 2 } }
+                    ]
+                },
+                
+                startup1: {
+                    text: "🚀 Стартап. Какая идея?",
+                    paths: [
+                        { title: "📱 Приложение", desc: "Мобильный сервис", next: "appStartup", item: "📱 Апп", points: { mind: 3, money: 3 } },
+                        { title: "🌱 Экология", desc: "Зелёные технологии", next: "ecoStartup", item: "🌍 Планета", points: { care: 4, mind: 2 } },
+                        { title: "🍔 Доставка", desc: "Еда", next: "foodStartup", item: "🍔 Бургер", points: { money: 3, fun: 2 } },
+                        { title: "🎓 Образование", desc: "Онлайн-курсы", next: "eduStartup", item: "🎓 Курс", points: { mind: 3, care: 3 } }
+                    ]
+                },
+                
+                // ===== ПУТЕШЕСТВИЯ =====
+                travel1: {
+                    text: "🌍 Путешествия. Куда сначала?",
+                    paths: [
+                        { title: "🏔️ Горы", desc: "Альпинизм", next: "mountains1", item: "⛰️ Ледоруб", points: { travel: 3, energy: 2 } },
+                        { title: "🏖️ Море", desc: "Пляжный отдых", next: "sea1", item: "🏄 Серф", points: { fun: 3, calm: 2 } },
+                        { title: "🏙️ Мегаполисы", desc: "Нью-Йорк, Токио", next: "city1", item: "🗽 Статуя", points: { travel: 3, money: 1 } },
+                        { title: "🌄 Природа", desc: "Леса, озёра", next: "nature1", item: "🏕️ Палатка", points: { calm: 3, travel: 2 } }
+                    ]
+                },
+                
+                mountains1: {
+                    text: "🏔️ Ты в горах. Что чувствуешь?",
+                    paths: [
+                        { title: "🥇 Покорить вершину", desc: "Эверест ждёт", next: "everest", item: "🚩 Флаг", points: { energy: 4, travel: 3 } },
+                        { title: "📸 Фотографировать", desc: "Красота вокруг", next: "photoTravel", item: "📷 Фото", points: { art: 3, calm: 3 } },
+                        { title: "🧘 Медитировать", desc: "Тишина", next: "meditate", item: "🧘 Покой", points: { calm: 4, mind: 2 } },
+                        { title: "🏕️ Жить в лагере", desc: "Палатки, костёр", next: "camp", item: "🔥 Костёр", points: { fun: 3, social: 2 } }
+                    ]
+                },
+                
+                // ===== ТВОРЧЕСТВО =====
+                art1: {
+                    text: "🎨 Творчество. Что выберешь?",
+                    paths: [
+                        { title: "🎸 Музыка", desc: "Играть и петь", next: "music1", item: "🎸 Гитара", points: { art: 3 } },
+                        { title: "🎬 Кино", desc: "Снимать фильмы", next: "cinema1", item: "🎥 Камера", points: { art: 3, fun: 2 } },
+                        { title: "✍️ Писательство", desc: "Сочинять", next: "write1", item: "✍️ Перо", points: { mind: 3, art: 2 } },
+                        { title: "🎨 Рисование", desc: "Картины", next: "paint1", item: "🎨 Кисть", points: { art: 3, calm: 2 } }
+                    ]
+                },
+                
+                music1: {
+                    text: "🎸 Ты хочешь заниматься музыкой. Как?",
+                    paths: [
+                        { title: "🎤 Солист", desc: "Сцена и слава", next: "singer", item: "🎤 Микрофон", points: { art: 4, fun: 3 } },
+                        { title: "🎸 Гитарист в группе", desc: "Рок-звезда", next: "bandMember", item: "🎸 Электруха", points: { fun: 4, art: 3 } },
+                        { title: "🎼 Композитор", desc: "Писать музыку", next: "composer", item: "🎹 Синтезатор", points: { mind: 3, art: 4 } },
+                        { title: "🏫 Учитель музыки", desc: "Учить детей", next: "musicTeacher", item: "📚 Ноты", points: { care: 4, art: 2 } }
+                    ]
+                },
+                
+                cinema1: {
+                    text: "🎬 Кино. Какая роль?",
+                    paths: [
+                        { title: "🎭 Актёр", desc: "Играть роли", next: "actor", item: "🎭 Маска", points: { art: 4, fun: 3 } },
+                        { title: "🎥 Режиссёр", desc: "Создавать миры", next: "director", item: "🎥 Камера", points: { art: 4, mind: 3 } },
+                        { title: "✍️ Сценарист", desc: "Придумывать истории", next: "screenwriter", item: "📜 Сценарий", points: { mind: 4, art: 3 } },
+                        { title: "📸 Оператор", desc: "Ловить кадр", next: "cameraman", item: "📸 Объектив", points: { art: 3, travel: 2 } }
+                    ]
+                },
+                
+                // ===== ЛЮБОВЬ И ОТНОШЕНИЯ =====
+                love1: {
+                    text: "❤️ Ты ищешь любовь. Где встретишь?",
+                    paths: [
+                        { title: "🎓 В университете", desc: "Одногруппник", next: "universityLove", item: "💕 Влюблённость", points: { love: 3 } },
+                        { title: "💼 На работе", desc: "Коллега", next: "workLove", item: "💼 Совещание", points: { love: 2, money: 1 } },
+                        { title: "🌍 В путешествии", desc: "Случайность", next: "travelLove", item: "✈️ Билет", points: { love: 3, travel: 2 } },
+                        { title: "📱 В интернете", desc: "Тиндер", next: "onlineLove", item: "📱 Свайп", points: { love: 2, fun: 2 } }
+                    ]
+                },
+                
+                universityLove: {
+                    text: "🎓 Вы учитесь вместе. Что дальше?",
+                    paths: [
+                        { title: "💑 Встречаться", desc: "Романтика", next: "dating", item: "🌹 Свидание", points: { love: 4 } },
+                        { title: "🤝 Дружить", desc: "Надёжный друг", next: "friendLove", item: "🤗 Дружба", points: { social: 4 } },
+                        { title: "📚 Учиться вместе", desc: "Проекты", next: "studyLove", item: "📖 Книга", points: { mind: 3, love: 2 } },
+                        { title: "💔 Пропустить", desc: "Не сейчас", next: "passLove", item: "⏳ Время", points: { calm: 3 } }
+                    ]
+                },
+                
+                // ===== СЕМЬЯ =====
+                family1: {
+                    text: "👨‍👩‍👧 Семья поддержала. Твои мысли?",
+                    paths: [
+                        { title: "🏠 Остаться рядом", desc: "Жить с семьёй", next: "stayFamily", item: "🏡 Дом", points: { calm: 3, care: 2 } },
+                        { title: "💼 Помогать им", desc: "Поддержка", next: "helpFamily", item: "🤝 Забота", points: { care: 4 } },
+                        { title: "🚀 Уехать, но звонить", desc: "Свобода", next: "leaveFamily", item: "📞 Телефон", points: { travel: 2, love: 2 } },
+                        { title: "🏛️ Продолжить династию", desc: "Дело семьи", next: "dynasty", item: "🏛️ Наследие", points: { money: 3, care: 2 } }
+                    ]
+                },
+                
+                // ===== ДРУЗЬЯ =====
+                friends1: {
+                    text: "🤝 Друзья с тобой. Что делаете?",
+                    paths: [
+                        { title: "🎉 Тусовки", desc: "Веселиться", next: "partyFriends", item: "🥂 Вечеринка", points: { fun: 4 } },
+                        { title: "💼 Бизнес вместе", desc: "Общее дело", next: "businessFriends", item: "🤝 Партнёрство", points: { money: 4 } },
+                        { title: "🌍 Путешествия", desc: "Вместе в путь", next: "travelFriends", item: "🗺️ Карта", points: { travel: 4 } },
+                        { title: "🏠 Просто быть рядом", desc: "Поддержка", next: "supportFriends", item: "💬 Разговор", points: { calm: 3, care: 2 } }
+                    ]
+                },
+                
+                // Финальные узлы (более 30 вариантов!)
+                aiStartup: { 
+                    final: true,
+                    text: "🤖 Ты создал успешный AI-стартап!",
+                    type: 'mind',
+                    points: { mind: 10, money: 8 }
+                },
+                aiCorp: { 
+                    final: true,
+                    text: "🏢 Ты работаешь в ведущей tech-корпорации!",
+                    type: 'money',
+                    points: { money: 10, calm: 5 }
+                },
+                aiScience: { 
+                    final: true,
+                    text: "🔬 Ты учёный, меняющий мир!",
+                    type: 'mind',
+                    points: { mind: 10, calm: 5 }
+                },
+                surgeon: { 
+                    final: true,
+                    text: "💉 Ты спасаешь жизни каждый день!",
+                    type: 'care',
+                    points: { care: 10, mind: 5 }
+                },
+                psych: { 
+                    final: true,
+                    text: "🧠 Ты помогаешь людям обрести душевное равновесие!",
+                    type: 'care',
+                    points: { care: 8, mind: 5, calm: 5 }
+                },
+                manager: { 
+                    final: true,
+                    text: "📊 Ты успешный руководитель отдела!",
+                    type: 'money',
+                    points: { money: 8, social: 5 }
+                },
+                financier: { 
+                    final: true,
+                    text: "💰 Ты управляешь миллионами!",
+                    type: 'money',
+                    points: { money: 10, mind: 5 }
+                },
+                appStartup: { 
+                    final: true,
+                    text: "📱 Твоё приложение скачали миллионы!",
+                    type: 'fun',
+                    points: { fun: 8, money: 7, mind: 5 }
+                },
+                ecoStartup: { 
+                    final: true,
+                    text: "🌍 Ты спасаешь планету!",
+                    type: 'care',
+                    points: { care: 10, mind: 5 }
+                },
+                everest: { 
+                    final: true,
+                    text: "🏔️ Ты покорил Эверест!",
+                    type: 'travel',
+                    points: { travel: 10, energy: 8 }
+                },
+                singer: { 
+                    final: true,
+                    text: "🎤 Твои песни слушают миллионы!",
+                    type: 'art',
+                    points: { art: 10, fun: 8 }
+                },
+                bandMember: { 
+                    final: true,
+                    text: "🎸 Ваша группа собирает стадионы!",
+                    type: 'fun',
+                    points: { fun: 10, art: 7 }
+                },
+                composer: { 
+                    final: true,
+                    text: "🎼 Твою музыку играют оркестры!",
+                    type: 'art',
+                    points: { art: 10, mind: 5 }
+                },
+                actor: { 
+                    final: true,
+                    text: "🎭 Ты звезда кино!",
+                    type: 'art',
+                    points: { art: 9, fun: 8 }
+                },
+                director: { 
+                    final: true,
+                    text: "🎬 Твой фильм получил Оскар!",
+                    type: 'art',
+                    points: { art: 10, mind: 7 }
+                },
+                dating: { 
+                    final: true,
+                    text: "💑 Вы вместе уже много лет. Счастливы!",
+                    type: 'love',
+                    points: { love: 10, calm: 5 }
+                },
+                stayFamily: { 
+                    final: true,
+                    text: "🏠 Ты живёшь рядом с семьёй. Тепло и уютно!",
+                    type: 'calm',
+                    points: { calm: 10, love: 5 }
+                },
+                partyFriends: { 
+                    final: true,
+                    text: "🥂 Ты душа компании! Все хотят с тобой дружить!",
+                    type: 'fun',
+                    points: { fun: 10, social: 8 }
+                },
+                businessFriends: { 
+                    final: true,
+                    text: "🤝 Вы создали бизнес-империю вместе!",
+                    type: 'money',
+                    points: { money: 10, social: 7 }
+                },
+                travelFriends: { 
+                    final: true,
+                    text: "🌍 Вы объездили полмира! И это только начало!",
+                    type: 'travel',
+                    points: { travel: 10, fun: 7 }
+                },
+                python: { 
+                    final: true,
+                    text: "🐍 Ты стал гуру Python! Тебя приглашают во все компании!",
+                    type: 'mind',
+                    points: { mind: 8, money: 5 }
+                },
+                java: { 
+                    final: true,
+                    text: "☕ Ты корпоративный разработчик. Стабильность и деньги!",
+                    type: 'money',
+                    points: { money: 8, mind: 5 }
+                },
+                js: { 
+                    final: true,
+                    text: "🌐 Ты создаёшь крутые сайты. Фриланс и свобода!",
+                    type: 'fun',
+                    points: { fun: 7, money: 5 }
+                },
+                gamedev: { 
+                    final: true,
+                    text: "🎮 Ты делаешь игры, в которые играют миллионы!",
+                    type: 'fun',
+                    points: { fun: 9, mind: 6 }
+                },
+                judge: { 
+                    final: true,
+                    text: "🏛️ Ты судья. Твои решения справедливы!",
+                    type: 'calm',
+                    points: { calm: 8, mind: 7 }
+                },
+                pediatric: { 
+                    final: true,
+                    text: "👶 Ты лечишь детей. Ты их герой!",
+                    type: 'care',
+                    points: { care: 10, fun: 5 }
+                },
+                musicTeacher: { 
+                    final: true,
+                    text: "🏫 Ты учишь детей музыке. Они тебя обожают!",
+                    type: 'care',
+                    points: { care: 8, art: 6 }
+                },
+                photographer: { 
+                    final: true,
+                    text: "📸 Твои фотографии выставляют в галереях!",
+                    type: 'art',
+                    points: { art: 8, travel: 6 }
+                }
+            };
+
+            // Финальные типы для подсчёта
+            const finals = {
+                mind: { emoji: '🧠', title: 'МЫСЛИТЕЛЬ', desc: 'Твой интеллект - твоя суперсила!' },
+                money: { emoji: '👑', title: 'ЛИДЕР', desc: 'Ты добился успеха и признания!' },
+                travel: { emoji: '✈️', title: 'ПУТЕШЕСТВЕННИК', desc: 'Мир - твой дом, ты везде как рыба в воде!' },
+                art: { emoji: '🎨', title: 'ТВОРЕЦ', desc: 'Ты создаёшь прекрасное и вдохновляешь других!' },
+                care: { emoji: '❤️', title: 'ЗАБОТЛИВЫЙ', desc: 'Ты делаешь мир лучше, помогая другим!' },
+                fun: { emoji: '🎉', title: 'ЗАЖИГАТЕЛЬ', desc: 'С тобой никогда не скучно, ты заражаешь радостью!' },
+                calm: { emoji: '🧘', title: 'МУДРЕЦ', desc: 'Ты нашёл гармонию и внутренний покой!' },
+                social: { emoji: '👥', title: 'ДУША КОМПАНИИ', desc: 'Тебя любят и ценят за умение дружить!' },
+                love: { emoji: '💑', title: 'РОМАНТИК', desc: 'Ты умеешь любить и быть любимым!' },
+                energy: { emoji: '⚡', title: 'ВЕЧНЫЙ ДВИГАТЕЛЬ', desc: 'Твоя энергия заражает всех вокруг!' }
+            };
+
+            let currentNode = 'start';
+            let inventory = [];
+            let scores = {
+                mind:0, money:0, travel:0, art:0, care:0, 
+                fun:0, calm:0, social:0, love:0, energy:0
+            };
+            
+            let pathHistory = [];
+            let stepCount = 0;
+            const totalSteps = 20; // Для прогресс-бара
+
+            function updateProgress() {
+                let percent = (stepCount / totalSteps) * 100;
+                if (percent > 100) percent = 100;
+                progressBar.style.width = percent + '%';
+            }
+
+            function renderNode(nodeId) {
+                let node = questTree[nodeId];
+                if (!node) {
+                    // Если узел не найден, показываем финал с накопленными баллами
+                    showFinalResult();
+                    return;
+                }
+
+                stepCount++;
+                updateProgress();
+                pathHistory.push(nodeId);
+
+                // Если это финальный узел
+                if (node.final) {
+                    // Добавляем финальные очки
+                    if (node.points) {
+                        Object.keys(node.points).forEach(k => {
+                            if (scores[k] !== undefined) scores[k] += node.points[k];
+                        });
+                    }
+                    // Определяем тип финала
+                    let finalType = node.type || Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+                    showFinalResult(finalType, node.text);
+                    return;
+                }
+
+                // Обычный узел с выбором
+                let html = `
+                    <div class="question-text">${node.text}</div>
+                    <div class="inventory">
+                        <strong>🎒 Инвентарь:</strong> ${inventory.length ? inventory.join(' · ') : 'пока пусто'}
+                    </div>
+                    <div class="stats">
+                        ${Object.entries(scores).filter(([_, v]) => v > 0).map(([k, v]) => 
+                            `<span class="stat-badge">${k}: ${v}</span>`
+                        ).join('')}
+                    </div>
+                    <div class="path-container">
+                `;
+
+                node.paths.forEach(path => {
+                    html += `
+                        <div class="path-card" 
+                             data-next="${path.next}" 
+                             data-item="${path.item || ''}" 
+                             data-points='${JSON.stringify(path.points || {})}'>
+                            <div class="path-emoji">${path.title.split(' ')[0]}</div>
+                            <div class="path-title">${path.title}</div>
+                            <div class="path-desc">${path.desc}</div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                
+                // Кнопка "Начать заново" всегда доступна
+                html += `<button class="action-button" id="restartBtn">🔄 Начать заново</button>`;
+                
+                gameArea.innerHTML = html;
+
+                // Обработчики для карточек
+                document.querySelectorAll('.path-card').forEach(card => {
+                    card.addEventListener('click', function() {
+                        let next = this.dataset.next;
+                        let item = this.dataset.item;
+                        let points = JSON.parse(this.dataset.points);
+
+                        if (item) {
+                            inventory.push(item);
+                        }
+
+                        Object.keys(points).forEach(k => {
+                            if (scores[k] !== undefined) scores[k] += points[k];
+                        });
+
+                        if (next && questTree[next]) {
+                            renderNode(next);
+                        } else {
+                            // Если следующего узла нет, показываем финал
+                            showFinalResult();
+                        }
+                    });
+                });
+
+                // Кнопка рестарта
+                document.getElementById('restartBtn').addEventListener('click', () => {
+                    resetGame();
+                });
+            }
+
+            function showFinalResult(specificType = null, finalText = null) {
+                let maxType = specificType;
+                if (!maxType) {
+                    maxType = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+                }
+                
+                let f = finals[maxType] || finals.mind;
+                
+                // Подсчёт очков
+                let totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
+                
+                // Топ-3 качества
+                let topStats = Object.entries(scores)
+                    .filter(([_, v]) => v > 0)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 3);
+
+                let statsHtml = topStats.map(([k, v]) => 
+                    `<span class="stat-badge">${k}: ${'⭐'.repeat(Math.min(5, Math.ceil(v/5)))}</span>`
+                ).join(' ');
+
+                gameArea.innerHTML = `
+                    <div class="final-result">
+                        <div class="final-emoji">${f.emoji}</div>
+                        <div class="final-title">${f.title}</div>
+                        <div class="final-desc">
+                            ${finalText || f.desc}
+                        </div>
+                        
+                        <div class="inventory">
+                            <strong>🎒 Инвентарь:</strong><br>
+                            ${inventory.join('<br>') || 'пусто'}
+                        </div>
+                        
+                        <div class="stats" style="justify-content: center;">
+                            ${statsHtml}
+                        </div>
+                        
+                        <div style="margin: 20px 0; font-size: 1.1rem;">
+                            ✨ Всего очков: ${totalScore}
+                        </div>
+                        
+                        <div style="margin: 30px 0; padding: 20px; background: rgba(255,255,255,0.15); border-radius: 30px;">
+                            <div style="font-size: 1.3rem; margin-bottom: 10px;">📜 Твой путь:</div>
+                            <div style="font-size: 0.9rem; opacity: 0.8;">
+                                ${pathHistory.length} шагов к себе
+                            </div>
+                        </div>
+                        
+                        <button class="action-button" id="finalRestartBtn">🎓 Прожить заново</button>
+                    </div>
+                `;
+
+                document.getElementById('finalRestartBtn').addEventListener('click', () => {
+                    resetGame();
+                });
+            }
+
+            function resetGame() {
+                currentNode = 'start';
+                inventory = [];
+                scores = {
+                    mind:0, money:0, travel:0, art:0, care:0, 
+                    fun:0, calm:0, social:0, love:0, energy:0
+                };
+                pathHistory = [];
+                stepCount = 0;
+                progressBar.style.width = '0%';
+                renderNode('start');
+            }
+
+            // Старт игры
+            renderNode('start');
+
+            // Автомузыка
+            document.addEventListener('touchstart', () => { 
+                if(music.paused) music.play().catch(()=>{}); 
+            }, { once: true });
+        })();
+    </script>
+</body>
+</html>
